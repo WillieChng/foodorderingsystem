@@ -1,6 +1,7 @@
-package foodorderingsystem.View;
+package foodorderingsystem.View.Customer;
 
 import foodorderingsystem.Controller.Controller;
+import foodorderingsystem.View.UI;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;

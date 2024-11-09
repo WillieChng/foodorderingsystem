@@ -3,6 +3,7 @@ package foodorderingsystem.Controller;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import foodorderingsystem.Model.Cart;
 import foodorderingsystem.Model.MenuItem;
@@ -16,8 +17,13 @@ public class Controller {
 
     public Controller(Order order, Connection connection) {
         this.order = order;
-        this.connection = connection;
+        this.connection = connection != null ? connection : createMockConnection();
         this.cart = new Cart(); // Initialize the cart object
+    }
+
+    private Connection createMockConnection() {
+        // Create a mock connection or handle it appropriately
+        return null;
     }
 
     public void updateOrderDetails(String details) {
@@ -62,7 +68,11 @@ public class Controller {
         cart.addItem(item);
     }
 
-    public List<MenuItem> getCartItems() {
+    public void removeItemFromCart(MenuItem item) {
+        cart.removeItem(item);
+    }
+
+    public Map<MenuItem, Integer> getCartItems() {
         return cart.getItems();
     }
 

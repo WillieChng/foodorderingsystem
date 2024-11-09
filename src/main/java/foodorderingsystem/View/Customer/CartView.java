@@ -1,7 +1,8 @@
-package foodorderingsystem.View;
+package foodorderingsystem.View.Customer;
 
 import foodorderingsystem.Controller.Controller;
 import foodorderingsystem.Model.MenuItem;
+import foodorderingsystem.View.UI;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -12,7 +13,7 @@ import javafx.stage.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
-import java.util.List;
+import java.util.Map;
 
 public class CartView extends UI {
 
@@ -45,10 +46,13 @@ public class CartView extends UI {
         listViewWithButtons.setAlignment(Pos.CENTER);
 
         // Retrieve cart items from the controller
-        List<MenuItem> cartItems = controller.getCartItems();
+        Map<MenuItem, Integer> cartItems = controller.getCartItems();
 
-        if (cartItems != null) {
-            for (MenuItem item : cartItems) {
+        if (cartItems != null && !cartItems.isEmpty()) {
+            for (Map.Entry<MenuItem, Integer> entry : cartItems.entrySet()) {
+                MenuItem item = entry.getKey();
+                int quantity = entry.getValue();
+
                 GridPane itemGrid = new GridPane();
                 itemGrid.setHgap(10);
                 itemGrid.setVgap(10);
@@ -70,9 +74,31 @@ public class CartView extends UI {
                 Label priceLabel = new Label("RM" + item.getPrice());
                 GridPane.setConstraints(priceLabel, 1, 2);
 
-                itemGrid.getChildren().addAll(imageView, nameLabel, descriptionLabel, priceLabel);
+                Label quantityLabel = new Label("Quantity: " + quantity);
+                GridPane.setConstraints(quantityLabel, 1, 3);
+
+                Button addButton = new Button("+");
+                addButton.setOnAction(e -> {
+                    controller.addItemToCart(item);
+                    start(primaryStage); // Refresh the view
+                });
+
+                Button removeButton = new Button("-");
+                removeButton.setOnAction(e -> {
+                    controller.removeItemFromCart(item);
+                    start(primaryStage); // Refresh the view
+                });
+
+                HBox buttonBox = new HBox(5, addButton, removeButton); // HBox with 5px spacing
+                GridPane.setConstraints(buttonBox, 1, 4, 2, 1);
+
+                itemGrid.getChildren().addAll(imageView, nameLabel, descriptionLabel, priceLabel, quantityLabel, buttonBox);
                 listViewWithButtons.getChildren().add(itemGrid);
             }
+        } else {
+            Label noItemsLabel = new Label("No Items In Cart :(");
+            noItemsLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+            listViewWithButtons.getChildren().add(noItemsLabel);
         }
 
         // Create a ScrollPane to hold the listViewWithButtons

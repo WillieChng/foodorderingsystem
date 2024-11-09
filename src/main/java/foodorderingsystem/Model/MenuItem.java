@@ -1,5 +1,7 @@
 package foodorderingsystem.Model;
 
+import java.util.Objects;
+
 public class MenuItem {
     private int id;
     private String name;
@@ -43,5 +45,18 @@ public class MenuItem {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MenuItem menuItem = (MenuItem) o;
+        return id == menuItem.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

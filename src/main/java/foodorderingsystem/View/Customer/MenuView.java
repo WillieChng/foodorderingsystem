@@ -1,7 +1,8 @@
-package foodorderingsystem.View;
+package foodorderingsystem.View.Customer;
 
 import foodorderingsystem.Controller.Controller;
 import foodorderingsystem.Model.MenuItem;
+import foodorderingsystem.View.UI;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -16,7 +17,7 @@ import java.util.List;
 public class MenuView extends UI {
 
     private static final Image[] IMAGES = {
-            new Image("file:src/main/resources/images/Image6.png"),
+            new Image("file:src/main/resources/images/Image1.png"),
             new Image("file:src/main/resources/images/Image2.png"),
             new Image("file:src/main/resources/images/Image3.png"),
             new Image("file:src/main/resources/images/Image4.png"),
