@@ -1,7 +1,7 @@
 package foodorderingsystem.View.Customer;
 
 import foodorderingsystem.Controller.Controller;
-import foodorderingsystem.Model.MenuItem;
+import foodorderingsystem.Model.Customer.MenuItem;
 import foodorderingsystem.View.UI;
 import javafx.geometry.*;
 import javafx.scene.*;
@@ -128,6 +128,7 @@ public class CartView extends UI {
         });
         checkoutButton.setOnAction(e -> {
             // Handle checkout logic here
+            controller.checkout();
             System.out.println("Proceeding to checkout...");
         });
 

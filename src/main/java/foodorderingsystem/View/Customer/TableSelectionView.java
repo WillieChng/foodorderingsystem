@@ -50,7 +50,6 @@ public class TableSelectionView extends UI {
         proceedButton.setOnAction(e -> {
             int selectedTable = spinner.getValue();
             controller.setTableNumber(selectedTable);
-            controller.updateOrderDetails("Table " + selectedTable);
             
             MenuView menuView = new MenuView(controller);
             menuView.start(primaryStage);

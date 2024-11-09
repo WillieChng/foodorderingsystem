@@ -6,11 +6,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import foodorderingsystem.Controller.Controller;
-import foodorderingsystem.Model.Order;
+import foodorderingsystem.Model.Staff.Order;
 import foodorderingsystem.Others.DatabaseUtil;
 import foodorderingsystem.View.Customer.TableSelectionView;
 
 public class CustomerMain extends Application {
+
+    private Controller controller;
+    private Connection connection;
 
     @Override
     public void start(Stage primaryStage) {
@@ -18,22 +21,33 @@ public class CustomerMain extends Application {
         ModuleLayer.boot().findModule("foodorderingsystem").ifPresent(module -> {
             module.addOpens("foodorderingsystem.Model", ModuleLayer.boot().findModule("javafx.base").orElseThrow());
         });
-        
-        // Create an Order object
-        Order order = new Order(0, null);
 
-        // Create a Controller object with the Order and Database Connection
-        try (Connection connection = DatabaseUtil.getConnection()) {
+        // Create an Order object
+        Order order = new Order(0, null, 0);
+
+        try {
+            // Create a Database Connection
+            connection = DatabaseUtil.getInstance().getConnection();
+
             // Create tables if they do not exist
-            DatabaseUtil.createTables(connection);
-            
-            Controller controller = new Controller(order, connection);
+            DatabaseUtil.getInstance().createTables();
+
+            // Create a Controller object with the Order and Database Connection
+            controller = new Controller(order, connection);
 
             // Create a TableSelectionView object with the Controller
             TableSelectionView tableSelectionView = new TableSelectionView(controller);
             tableSelectionView.start(primaryStage);
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void stop() {
+        // Close the connection when the application exits
+        if (controller != null) {
+            controller.closeConnection();
         }
     }
 

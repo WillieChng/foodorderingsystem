@@ -4,25 +4,54 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Map;
 
 import foodorderingsystem.Controller.Controller;
-import foodorderingsystem.Model.Order;
+import foodorderingsystem.Model.Staff.Order;
 import foodorderingsystem.Others.DatabaseUtil;
+import foodorderingsystem.View.Staff.CartManagementView;
 import foodorderingsystem.View.Staff.StaffView;
+import javafx.scene.image.Image;
 
 public class StaffMain extends Application {
+    private Connection connection;
+
     @Override
     public void start(Stage primaryStage) {
         // Create an Order object
-        Order order = new Order(0, null);
+        Order order = new Order(0, null, 0);
 
         // Create a Controller object with the Order and Database Connection
-        try (Connection connection = DatabaseUtil.getConnection()) {
+        try {
+            connection = DatabaseUtil.getInstance().getConnection();
+            // Create tables if they do not exist
+            DatabaseUtil.getInstance().createTables();
+
             Controller controller = new Controller(order, connection);
 
-            // Create a StaffView object with the Controller
-            StaffView staffView = new StaffView(controller);
+            // Load images dynamically
+            CartManagementView cartManagementView = new CartManagementView();
+            Map<String, Image> nameToImageMap = cartManagementView.loadImages();
+
+            // Set the controller and images for the CartManagementView
+            cartManagementView.setControllerAndImages(controller, nameToImageMap);
+
+            // Create a StaffView object with the Controller and nameToImageMap
+            StaffView staffView = new StaffView();
+            staffView.setController(controller);
+            staffView.setNameToImageMap(nameToImageMap);
             staffView.start(primaryStage);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void stop() {
+        // Close the connection when the application exits
+        try {
+            DatabaseUtil.getInstance().closeConnection();
         } catch (SQLException e) {
             e.printStackTrace();
         }

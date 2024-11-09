@@ -1,7 +1,7 @@
 package foodorderingsystem.Others;
 
-import foodorderingsystem.Model.MenuItem;
-import foodorderingsystem.Model.Order;
+import foodorderingsystem.Model.Customer.MenuItem;
+import foodorderingsystem.Model.Staff.Order;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,12 +11,38 @@ public class DatabaseUtil {
     private static final String URL = "jdbc:mysql://localhost:3306/fos_db";
     private static final String USER = "root";
     private static final String PASSWORD = "li852456";
+    private static DatabaseUtil instance;
+    private Connection connection;
 
-    public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+    private DatabaseUtil() {
+        // private constructor to prevent instantiation
     }
 
-    public static void createTables(Connection connection) throws SQLException {
+    public static DatabaseUtil getInstance() {
+        if (instance == null) {
+            synchronized (DatabaseUtil.class) {
+                if (instance == null) {
+                    instance = new DatabaseUtil();
+                }
+            }
+        }
+        return instance;
+    }
+
+    public Connection getConnection() throws SQLException {
+        if (connection == null || connection.isClosed()) {
+            connection = DriverManager.getConnection(URL, USER, PASSWORD);
+        }
+        return connection;
+    }
+
+    public void closeConnection() throws SQLException {
+        if (connection != null && !connection.isClosed()) {
+            connection.close();
+        }
+    }
+
+    public void createTables() throws SQLException {
         String createMenuTable = "CREATE TABLE IF NOT EXISTS menu (" +
                                    "id INT AUTO_INCREMENT PRIMARY KEY, " +
                                    "name VARCHAR(255), " +
@@ -25,18 +51,18 @@ public class DatabaseUtil {
         String createOrdersTable = "CREATE TABLE IF NOT EXISTS orders (" +
                                    "id INT AUTO_INCREMENT PRIMARY KEY, " +
                                    "table_number INT, " +
-                                   "details VARCHAR(255))";
+                                   "name VARCHAR(255), " +
+                                   "quantity INT)";
 
-        try (Statement statement = connection.createStatement()) {
+        try (Statement statement = getConnection().createStatement()) {
             statement.execute(createMenuTable);
             statement.execute(createOrdersTable);
         }
     }
 
-    public static void insertMenuItem(MenuItem menuItem) throws SQLException {
+    public void insertMenuItem(MenuItem menuItem) throws SQLException {
         String insertMenuItemSQL = "INSERT INTO menu (name, description, price) VALUES (?, ?, ?)";
-        try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(insertMenuItemSQL)) {
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(insertMenuItemSQL)) {
             preparedStatement.setString(1, menuItem.getName());
             preparedStatement.setString(2, menuItem.getDescription());
             preparedStatement.setDouble(3, menuItem.getPrice());
@@ -44,11 +70,10 @@ public class DatabaseUtil {
         }
     }
 
-    public static List<MenuItem> getMenuItems() throws SQLException {
+    public List<MenuItem> getMenuItems() throws SQLException {
         List<MenuItem> menuItems = new ArrayList<>();
         String sql = "SELECT * FROM menu";
-        try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
              ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
@@ -63,16 +88,16 @@ public class DatabaseUtil {
         return menuItems;
     }
 
-    public static List<Order> getOrders() throws SQLException {
+    public List<Order> getOrders() throws SQLException {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT * FROM orders";
-        try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
              ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
                 int tableNumber = resultSet.getInt("table_number");
-                String details = resultSet.getString("details");
-                orders.add(new Order(tableNumber, details));
+                String name = resultSet.getString("name");
+                int quantity = resultSet.getInt("quantity");
+                orders.add(new Order(tableNumber, name, quantity));
             }
         }
         return orders;

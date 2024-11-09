@@ -1,4 +1,4 @@
-package foodorderingsystem.Model;
+package foodorderingsystem.Model.Customer;
 
 import java.util.Objects;
 

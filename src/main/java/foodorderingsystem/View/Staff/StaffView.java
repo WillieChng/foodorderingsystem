@@ -7,12 +7,28 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
+
+import java.util.Map;
 
 public class StaffView extends Application {
     private Controller controller;
+    private Map<String, Image> nameToImageMap;
+
+    public StaffView() {
+        // No-argument constructor required by JavaFX
+    }
 
     public StaffView(Controller controller) {
         this.controller = controller;
+    }
+
+    public void setController(Controller controller) {
+        this.controller = controller;
+    }
+
+    public void setNameToImageMap(Map<String, Image> nameToImageMap) {
+        this.nameToImageMap = nameToImageMap;
     }
 
     @Override
@@ -29,7 +45,8 @@ public class StaffView extends Application {
 
         // Add event handler to the "Cart Management" button
         cartManagementButton.setOnAction(e -> {
-            CartManagementView cartManagementView = new CartManagementView(controller);
+            CartManagementView cartManagementView = new CartManagementView();
+            cartManagementView.setControllerAndImages(controller, nameToImageMap);
             cartManagementView.start(primaryStage);
         });
 
