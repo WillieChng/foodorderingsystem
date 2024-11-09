@@ -1,6 +1,7 @@
 package foodorderingsystem.Others;
 
 import foodorderingsystem.Model.MenuItem;
+import foodorderingsystem.Model.Order;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -21,9 +22,14 @@ public class DatabaseUtil {
                                    "name VARCHAR(255), " +
                                    "description VARCHAR(255), " +
                                    "price DOUBLE)";
+        String createOrdersTable = "CREATE TABLE IF NOT EXISTS orders (" +
+                                   "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                                   "table_number INT, " +
+                                   "details VARCHAR(255))";
 
         try (Statement statement = connection.createStatement()) {
             statement.execute(createMenuTable);
+            statement.execute(createOrdersTable);
         }
     }
 
@@ -55,5 +61,20 @@ public class DatabaseUtil {
             }
         }
         return menuItems;
+    }
+
+    public static List<Order> getOrders() throws SQLException {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT * FROM orders";
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                int tableNumber = resultSet.getInt("table_number");
+                String details = resultSet.getString("details");
+                orders.add(new Order(tableNumber, details));
+            }
+        }
+        return orders;
     }
 }

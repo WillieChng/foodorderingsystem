@@ -79,4 +79,13 @@ public class Controller {
     public void clearCart() {
         cart.clear();
     }
+
+    public List<Order> getOrders() {
+        try {
+            return DatabaseUtil.getOrders();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

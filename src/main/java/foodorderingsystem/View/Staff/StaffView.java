@@ -22,10 +22,16 @@ public class StaffView extends Application {
         Button generateReceiptButton = new Button("Generate Receipt");
         Button manageMenuButton = new Button("Manage Menu");
 
-        // Set button styles
-        cartManagementButton.setStyle("-fx-font-size: 16px; -fx-padding: 10px;");
-        generateReceiptButton.setStyle("-fx-font-size: 16px; -fx-padding: 10px;");
-        manageMenuButton.setStyle("-fx-font-size: 16px; -fx-padding: 10px;");
+        // Set button styles to make them bigger
+        cartManagementButton.setStyle("-fx-font-size: 20px; -fx-padding: 15px;");
+        generateReceiptButton.setStyle("-fx-font-size: 20px; -fx-padding: 15px;");
+        manageMenuButton.setStyle("-fx-font-size: 20px; -fx-padding: 15px;");
+
+        // Add event handler to the "Cart Management" button
+        cartManagementButton.setOnAction(e -> {
+            CartManagementView cartManagementView = new CartManagementView(controller);
+            cartManagementView.start(primaryStage);
+        });
 
         // Create VBox and set alignment and spacing
         VBox vbox = new VBox(20, cartManagementButton, generateReceiptButton, manageMenuButton);
