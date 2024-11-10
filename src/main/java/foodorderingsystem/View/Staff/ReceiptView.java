@@ -80,6 +80,17 @@ public class ReceiptView {
         paidButton.setOnAction(e -> showConfirmationDialog(primaryStage));
         receiptBox.getChildren().add(paidButton);
 
+        // Create a "Back" button
+        Button backButton = new Button("Back");
+        backButton.setFont(new Font("Arial", 16));
+        backButton.setStyle("-fx-background-color: lightgray; -fx-text-fill: black; -fx-border-color: black; -fx-border-width: 4;");
+        backButton.setPrefSize(150, 50);
+        backButton.setOnAction(e -> {
+            StaffTableSelectionView tableSelectionView = new StaffTableSelectionView(controller);
+            tableSelectionView.start(primaryStage);
+        });
+        receiptBox.getChildren().add(backButton);
+
         // Create a BorderPane to add a white frame around the receipt
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(receiptBox);

@@ -5,12 +5,14 @@ public class Order {
     private String name;
     private int quantity;
     private double price; // Add a price field
+    private byte[] image; // Add an image field
 
-    public Order(int tableNumber, String name, int quantity, double price) {
+    public Order(int tableNumber, String name, int quantity, double price, byte[] image) {
         this.tableNumber = tableNumber;
         this.name = name;
         this.quantity = quantity;
         this.price = price; // Initialize the price field
+        this.image = image; // Initialize the image field
     }
 
     public int getTableNumber() {
@@ -43,6 +45,14 @@ public class Order {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 
     @Override

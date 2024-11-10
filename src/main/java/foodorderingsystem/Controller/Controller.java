@@ -11,11 +11,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.io.ByteArrayInputStream;
 
 import foodorderingsystem.Model.Customer.Cart;
 import foodorderingsystem.Model.Customer.MenuItem;
 import foodorderingsystem.Model.Staff.Order;
 import foodorderingsystem.Others.DatabaseUtil;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 public class Controller {
     private Order order;
@@ -113,15 +124,17 @@ public class Controller {
 
     public Map<Integer, List<Order>> getItemsFromOrders() {
         Map<Integer, List<Order>> orders = new HashMap<>();
-        String sql = "SELECT table_number, name, quantity FROM orders";
+        String sql = "SELECT table_number, name, quantity, price, image FROM orders";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql);
              ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
                 int tableNumber = resultSet.getInt("table_number");
                 String name = resultSet.getString("name");
                 int quantity = resultSet.getInt("quantity");
+                double price = resultSet.getDouble("price");
+                byte[] image = resultSet.getBytes("image");
 
-                Order order = new Order(tableNumber, name, quantity, 0);
+                Order order = new Order(tableNumber, name, quantity, price, image);
 
                 orders.computeIfAbsent(tableNumber, k -> new ArrayList<>()).add(order);
             }
@@ -145,7 +158,7 @@ public class Controller {
 
     public void checkout() {
         try {
-            String sql = "INSERT INTO orders (table_number, name, quantity, price) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO orders (table_number, name, quantity, price, image) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                 for (Map.Entry<MenuItem, Integer> entry : cart.getItems().entrySet()) {
                     MenuItem item = entry.getKey();
@@ -154,6 +167,7 @@ public class Controller {
                     preparedStatement.setString(2, item.getName());
                     preparedStatement.setInt(3, quantity);
                     preparedStatement.setDouble(4, item.getPrice() * quantity);
+                    preparedStatement.setBytes(5, item.getImage());
                     preparedStatement.addBatch();
                 }
                 preparedStatement.executeBatch();
@@ -177,7 +191,7 @@ public class Controller {
     // New method to get orders for a specific table number
     public List<Order> getOrdersForTable(int tableNumber) {
         List<Order> orders = new ArrayList<>();
-        String sql = "SELECT table_number, name, quantity, price FROM orders WHERE table_number = ?";
+        String sql = "SELECT table_number, name, quantity, price, image FROM orders WHERE table_number = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, tableNumber);
             System.out.println("Debug: Executing query: " + preparedStatement);
@@ -185,8 +199,9 @@ public class Controller {
                 while (resultSet.next()) {
                     String name = resultSet.getString("name");
                     int quantity = resultSet.getInt("quantity");
-                    int price = resultSet.getInt("price");
-                    Order order = new Order(tableNumber, name, quantity, price);
+                    double price = resultSet.getDouble("price");
+                    byte[] image = resultSet.getBytes("image");
+                    Order order = new Order(tableNumber, name, quantity, price, image);
                     orders.add(order);
                     System.out.println("Debug: Retrieved order: " + order);
                 }
@@ -208,4 +223,205 @@ public class Controller {
             System.err.println("Error removing orders for table: " + e.getMessage());
         }
     }
+
+    // New method to remove a menu item
+    public void removeMenuItem(MenuItem menuItem) {
+        String sql = "DELETE FROM menu WHERE id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, menuItem.getID());
+            int rowsDeleted = preparedStatement.executeUpdate();
+            System.out.println("Debug: Removed " + rowsDeleted + " item(s) from menu table with id " + menuItem.getID());
+        } catch (SQLException e) {
+            System.err.println("Error removing menu item: " + e.getMessage());
+        }
+    }
+
+     // New method to display a pop-up form for updating a menu item
+     public void showUpdateMenuItemForm(MenuItem menuItem) {
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle("Update Menu Item");
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setHgap(10);
+        grid.setVgap(10);
+
+        // Image
+        ImageView imageView = new ImageView(new Image(new ByteArrayInputStream(menuItem.getImage())));
+        imageView.setFitWidth(100);
+        imageView.setFitHeight(100);
+        grid.add(new Label("Image:"), 0, 0);
+        grid.add(imageView, 1, 0);
+
+        // Button to choose a new image
+        Button chooseImageButton = new Button("Choose Image");
+        grid.add(chooseImageButton, 2, 0);
+
+        // Name
+        TextField nameField = new TextField(menuItem.getName());
+        grid.add(new Label("Name:"), 0, 1);
+        grid.add(nameField, 1, 1);
+
+        // Description
+        TextField descriptionField = new TextField(menuItem.getDescription());
+        grid.add(new Label("Description:"), 0, 2);
+        grid.add(descriptionField, 1, 2);
+
+        // Price
+        TextField priceField = new TextField(String.valueOf(menuItem.getPrice()));
+        grid.add(new Label("Price:"), 0, 3);
+        grid.add(priceField, 1, 3);
+
+        // File chooser for selecting a new image
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
+
+        // Store the new image bytes
+        final byte[][] newImageBytes = {null};
+
+        chooseImageButton.setOnAction(e -> {
+            File selectedFile = fileChooser.showOpenDialog(stage);
+            if (selectedFile != null) {
+                try {
+                    newImageBytes[0] = loadImage(selectedFile.getAbsolutePath());
+                    imageView.setImage(new Image(new ByteArrayInputStream(newImageBytes[0])));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        // Update Button
+        Button updateButton = new Button("Update");
+        updateButton.setOnAction(e -> {
+            String newName = nameField.getText();
+            String newDescription = descriptionField.getText();
+            double newPrice = Double.parseDouble(priceField.getText());
+
+            menuItem.setName(newName);
+            menuItem.setDescription(newDescription);
+            menuItem.setPrice(newPrice);
+
+            // Update the image if a new one was selected
+            if (newImageBytes[0] != null) {
+                menuItem.setImage(newImageBytes[0]);
+            }
+
+            updateMenuItem(menuItem);
+            stage.close();
+        });
+        grid.add(updateButton, 1, 4);
+
+        Scene scene = new Scene(grid, 400, 300);
+        stage.setScene(scene);
+        stage.showAndWait();
+    }
+
+    // New method to update a menu item in the database
+    public void updateMenuItem(MenuItem menuItem) {
+        String sql = "UPDATE menu SET name = ?, description = ?, price = ?, image = ? WHERE id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, menuItem.getName());
+            preparedStatement.setString(2, menuItem.getDescription());
+            preparedStatement.setDouble(3, menuItem.getPrice());
+            preparedStatement.setBytes(4, menuItem.getImage());
+            preparedStatement.setInt(5, menuItem.getID());
+            int rowsUpdated = preparedStatement.executeUpdate();
+            System.out.println("Debug: Updated " + rowsUpdated + " item(s) in menu table with id " + menuItem.getID());
+        } catch (SQLException e) {
+            System.err.println("Error updating menu item: " + e.getMessage());
+        }
+    }
+
+    // New method to display a pop-up form for adding a new menu item
+public void showAddMenuItemForm() {
+    Stage stage = new Stage();
+    stage.initModality(Modality.APPLICATION_MODAL);
+    stage.setTitle("Add Menu Item");
+
+    GridPane grid = new GridPane();
+    grid.setAlignment(Pos.CENTER);
+    grid.setPadding(new Insets(10, 10, 10, 10));
+    grid.setHgap(10);
+    grid.setVgap(10);
+
+    // Image
+    ImageView imageView = new ImageView();
+    imageView.setFitWidth(100);
+    imageView.setFitHeight(100);
+    grid.add(new Label("Image:"), 0, 0);
+    grid.add(imageView, 1, 0);
+
+    // Button to choose a new image
+    Button chooseImageButton = new Button("Choose Image");
+    grid.add(chooseImageButton, 2, 0);
+
+    // Name
+    TextField nameField = new TextField();
+    grid.add(new Label("Name:"), 0, 1);
+    grid.add(nameField, 1, 1);
+
+    // Description
+    TextField descriptionField = new TextField();
+    grid.add(new Label("Description:"), 0, 2);
+    grid.add(descriptionField, 1, 2);
+
+    // Price
+    TextField priceField = new TextField();
+    grid.add(new Label("Price:"), 0, 3);
+    grid.add(priceField, 1, 3);
+
+    // File chooser for selecting a new image
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
+
+    // Store the new image bytes
+    final byte[][] newImageBytes = {null};
+
+    chooseImageButton.setOnAction(e -> {
+        File selectedFile = fileChooser.showOpenDialog(stage);
+        if (selectedFile != null) {
+            try {
+                newImageBytes[0] = loadImage(selectedFile.getAbsolutePath());
+                imageView.setImage(new Image(new ByteArrayInputStream(newImageBytes[0])));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    });
+
+    // Add Button
+    Button addButton = new Button("Add");
+    addButton.setOnAction(e -> {
+        String name = nameField.getText();
+        String description = descriptionField.getText();
+        String priceText = priceField.getText();
+
+        if (name.isEmpty() || description.isEmpty() || priceText.isEmpty() || newImageBytes[0] == null) {
+            // Show an error message if any field is empty
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("All fields must be filled!");
+            alert.showAndWait();
+        } else {
+            double price = Double.parseDouble(priceText);
+            MenuItem menuItem = new MenuItem(0, name, description, price, newImageBytes[0]);
+            try {
+                databaseUtil.insertMenuItem(menuItem);
+                System.out.println("Menu item added: " + name);
+                stage.close();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+    });
+    grid.add(addButton, 1, 4);
+
+    Scene scene = new Scene(grid, 400, 300);
+    stage.setScene(scene);
+    stage.showAndWait();
+}
 }

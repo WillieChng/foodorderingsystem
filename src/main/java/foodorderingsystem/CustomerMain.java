@@ -25,7 +25,7 @@ public class CustomerMain extends Application {
         });
 
         // Create an Order object
-        Order order = new Order(0, null, 0, 0);
+        Order order = new Order(0, null, 0, 0, null);
 
         try {
             // Create a Database Connection

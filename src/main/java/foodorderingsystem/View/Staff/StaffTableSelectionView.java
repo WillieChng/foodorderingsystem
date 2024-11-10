@@ -56,8 +56,21 @@ public class StaffTableSelectionView {
             receiptView.start(primaryStage);
         });
 
+        // Create a "Back" button
+        Button backButton = new Button("Back");
+        backButton.setFont(new Font("Arial", 16));
+        backButton.setStyle("-fx-background-color: lightgray; -fx-text-fill: black; -fx-border-color: black; -fx-border-width: 4;");
+        backButton.setPrefSize(150, 50);
+        GridPane.setConstraints(backButton, 0, 3);
+
+        // Add event handler to switch back to StaffView
+        backButton.setOnAction(e -> {
+            StaffView staffView = new StaffView(controller);
+            staffView.start(primaryStage);
+        });
+
         // Add all components to the grid
-        grid.getChildren().addAll(headerLabel, spinner, proceedButton);
+        grid.getChildren().addAll(headerLabel, spinner, proceedButton, backButton);
 
         // Update the scene's root node
         Scene scene = primaryStage.getScene();

@@ -5,14 +5,11 @@ import javafx.stage.Stage;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.io.IOException;
-import java.util.Map;
 
 import foodorderingsystem.Controller.Controller;
 import foodorderingsystem.Model.Staff.Order;
 import foodorderingsystem.Others.DatabaseUtil;
-import foodorderingsystem.View.Staff.CartManagementView;
 import foodorderingsystem.View.Staff.StaffView;
-import javafx.scene.image.Image;
 
 public class StaffMain extends Application {
     private Connection connection;
@@ -20,7 +17,7 @@ public class StaffMain extends Application {
     @Override
     public void start(Stage primaryStage) {
         // Create an Order object
-        Order order = new Order(0, null, 0, 0);
+        Order order = new Order(0, null, 0, 0, null);
 
         // Create a Controller object with the Order and Database Connection
         try {
@@ -30,17 +27,9 @@ public class StaffMain extends Application {
 
             Controller controller = new Controller(order, connection);
 
-            // Load images dynamically
-            CartManagementView cartManagementView = new CartManagementView();
-            Map<String, Image> nameToImageMap = cartManagementView.loadImages();
-
-            // Set the controller and images for the CartManagementView
-            cartManagementView.setControllerAndImages(controller, nameToImageMap);
-
-            // Create a StaffView object with the Controller and nameToImageMap
+            // Create a StaffView object with the Controller
             StaffView staffView = new StaffView();
             staffView.setController(controller);
-            staffView.setNameToImageMap(nameToImageMap);
             staffView.start(primaryStage);
 
         } catch (SQLException | IOException e) {

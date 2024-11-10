@@ -13,13 +13,12 @@ import javafx.stage.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 public class CartManagementView extends Application {
     private Controller controller;
-    private Map<String, Image> nameToImageMap;
 
     public CartManagementView() {
         // No-argument constructor required by JavaFX
@@ -27,11 +26,6 @@ public class CartManagementView extends Application {
 
     public void setController(Controller controller) {
         this.controller = controller;
-    }
-
-    public void setControllerAndImages(Controller controller, Map<String, Image> nameToImageMap) {
-        this.controller = controller;
-        this.nameToImageMap = nameToImageMap;
     }
 
     @Override
@@ -75,7 +69,6 @@ public class CartManagementView extends Application {
 
                 for (Order order : orderList) {
                     String name = order.getName().trim();
-                    String normalizedName = name.replaceAll("\\s+", "");
                     int quantity = order.getQuantity();
                     System.out.println("Debug: Displaying item: " + name + ", Quantity: " + quantity);
 
@@ -86,14 +79,15 @@ public class CartManagementView extends Application {
                     itemGrid.setStyle("-fx-background-color: #f9f9f9; -fx-border-color: #ccc; -fx-border-width: 1px;");
                     System.out.println("Debug: Created item grid for item: " + name);
 
-                    // Ensure valid image for menu item
-                    System.out.println("Debug: Looking for image with name: " + normalizedName);
-                    Image image = nameToImageMap.get(normalizedName);
-                    if (image == null) {
-                        System.out.println("Debug: Image not found for item: " + normalizedName + ", using default image.");
-                        image = new Image("file:src/main/resources/images/default.png");
+                    // Retrieve the image from the order
+                    byte[] imageBytes = order.getImage();
+                    Image image;
+                    if (imageBytes != null && imageBytes.length > 0) {
+                        image = new Image(new ByteArrayInputStream(imageBytes));
+                        System.out.println("Debug: Found image for item: " + name);
                     } else {
-                        System.out.println("Debug: Found image for item: " + normalizedName);
+                        System.out.println("Debug: Image not found for item: " + name + ", using default image.");
+                        image = new Image("file:src/main/resources/images/default.png");
                     }
                     ImageView imageView = new ImageView(image);
                     imageView.setFitWidth(100);
@@ -170,20 +164,5 @@ public class CartManagementView extends Application {
         primaryStage.setTitle("Cart Management");
         primaryStage.show();
         System.out.println("Debug: Showed primary stage");
-    }
-
-    public Map<String, Image> loadImages() {
-        Map<String, Image> nameToImageMap = new HashMap<>();
-        nameToImageMap.put("ClassicMargheritaPizza", new Image("file:src/main/resources/images/ClassicMargheritaPizza.png"));
-        nameToImageMap.put("VeganBuddhaBowl", new Image("file:src/main/resources/images/VeganBuddhaBowl.png"));
-        nameToImageMap.put("BerryAcaiSmoothieBowl", new Image("file:src/main/resources/images/BerryAcaiSmoothieBowl.png"));
-        nameToImageMap.put("SpicyChickenTacos", new Image("file:src/main/resources/images/SpicyChickenTacos.png"));
-        nameToImageMap.put("BeefRamenNoodleBowl", new Image("file:src/main/resources/images/BeefRamenNoodleBowl.png"));
-        // Add more mappings as needed
-        return nameToImageMap;
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }

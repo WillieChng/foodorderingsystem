@@ -59,7 +59,8 @@ public class DatabaseUtil {
                                    "table_number INT, " +
                                    "name VARCHAR(255), " +
                                    "quantity INT, " +
-                                   "price DOUBLE)";
+                                   "price DOUBLE, " +
+                                   "image MEDIUMBLOB)";
 
         try (Statement statement = getConnection().createStatement()) {
             statement.execute(createMenuTable);
@@ -123,7 +124,9 @@ public class DatabaseUtil {
                 String name = resultSet.getString("name");
                 int quantity = resultSet.getInt("quantity");
                 double price = resultSet.getDouble("price");
-                orders.add(new Order(tableNumber, name, quantity, price));
+                byte[] image = resultSet.getBytes("image");
+                
+                orders.add(new Order(tableNumber, name, quantity, price, image));
             }
         }
         return orders;
