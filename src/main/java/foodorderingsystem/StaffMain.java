@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.io.IOException;
 import java.util.Map;
 
 import foodorderingsystem.Controller.Controller;
@@ -24,7 +25,7 @@ public class StaffMain extends Application {
         // Create a Controller object with the Order and Database Connection
         try {
             connection = DatabaseUtil.getInstance().getConnection();
-            // Create tables if they do not exist
+            // Create tables if they do not exist and import menu data if the table is empty
             DatabaseUtil.getInstance().createTables();
 
             Controller controller = new Controller(order, connection);
@@ -42,7 +43,7 @@ public class StaffMain extends Application {
             staffView.setNameToImageMap(nameToImageMap);
             staffView.start(primaryStage);
 
-        } catch (SQLException e) {
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
     }

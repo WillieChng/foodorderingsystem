@@ -12,17 +12,10 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.*;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 public class MenuView extends UI {
-
-    private static final Image[] IMAGES = {
-        new Image("file:src/main/resources/images/SpicyChickenTacos.png"),
-        new Image("file:src/main/resources/images/ClassicMargheritaPizza.png"),
-        new Image("file:src/main/resources/images/VeganBuddhaBowl.png"),
-        new Image("file:src/main/resources/images/BeefRamenNoodleBowl.png"),
-        new Image("file:src/main/resources/images/BerryAcaiSmoothieBowl.png")
-    };
 
     public MenuView(Controller controller) {
         super(controller);
@@ -49,15 +42,6 @@ public class MenuView extends UI {
         VBox listViewWithButtons = new VBox(10);
         listViewWithButtons.setAlignment(Pos.CENTER);
 
-        // Comment out the code that inserts menu items into the database
-        /*
-        controller.insertMenuItem(1, "Spicy Chicken Tacos", "Soft tortillas filled with seasoned grilled chicken, topped with fresh salsa, creamy avocado, and a zesty lime-cilantro sauce.", 10.0);
-        controller.insertMenuItem(2, "Classic Margherita Pizza", "A thin, crispy crust layered with tangy tomato sauce, fresh mozzarella, and fragrant basil leaves, drizzled with olive oil for an authentic Italian taste.", 15.0);
-        controller.insertMenuItem(3, "Vegan Buddha Bowl", "A colorful mix of quinoa, roasted chickpeas, sweet potatoes, avocado, and fresh greens, served with a tahini dressing for a hearty, nutrient-packed meal.", 20.0);
-        controller.insertMenuItem(4, "Beef Ramen Noodle Bowl", "Savory beef broth filled with tender beef slices, chewy ramen noodles, mushrooms, and a soft-boiled egg, garnished with green onions and nori.", 25.0);
-        controller.insertMenuItem(5, "Berry Acai Smoothie Bowl", "A refreshing blend of acai berries, bananas, and almond milk, topped with granola, coconut flakes, and fresh berries for a vibrant and healthy breakfast.", 30.0);
-        */
-
         // Retrieve menu items from the database
         List<MenuItem> menuItems = controller.getMenuItems();
 
@@ -69,7 +53,8 @@ public class MenuView extends UI {
                 itemGrid.setPadding(new Insets(10, 10, 10, 10));
                 itemGrid.setStyle("-fx-background-color: #f9f9f9; -fx-border-color: #ccc; -fx-border-width: 1px;");
 
-                ImageView imageView = new ImageView(IMAGES[item.getID() - 1]);
+                // Retrieve the image from the database
+                ImageView imageView = new ImageView(new Image(new ByteArrayInputStream(item.getImage())));
                 imageView.setFitWidth(100);
                 imageView.setFitHeight(100);
                 GridPane.setConstraints(imageView, 0, 0, 1, 4);
@@ -123,7 +108,7 @@ public class MenuView extends UI {
             tableSelectionView.start(primaryStage);
         });
         proceedToCartButton.setOnAction(e -> {
-            CartView cartView = new CartView(controller, IMAGES);
+            CartView cartView = new CartView(controller);
             cartView.start(primaryStage);
         });
 

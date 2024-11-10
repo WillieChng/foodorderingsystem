@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.io.IOException;
 
 import foodorderingsystem.Controller.Controller;
 import foodorderingsystem.Model.Staff.Order;
@@ -30,7 +31,7 @@ public class CustomerMain extends Application {
             // Create a Database Connection
             connection = DatabaseUtil.getInstance().getConnection();
 
-            // Create tables if they do not exist
+            // Create tables if they do not exist and import menu data if the table is empty
             DatabaseUtil.getInstance().createTables();
 
             // Create a Controller object with the Order and Database Connection
@@ -39,7 +40,7 @@ public class CustomerMain extends Application {
             // Create a TableSelectionView object with the Controller
             TableSelectionView tableSelectionView = new TableSelectionView(controller);
             tableSelectionView.start(primaryStage);
-        } catch (SQLException e) {
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
     }

@@ -3,6 +3,11 @@ package foodorderingsystem.Others;
 import foodorderingsystem.Model.Customer.MenuItem;
 import foodorderingsystem.Model.Staff.Order;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,30 +47,49 @@ public class DatabaseUtil {
         }
     }
 
-    public void createTables() throws SQLException {
+    public void createTables() throws SQLException, IOException {
         String createMenuTable = "CREATE TABLE IF NOT EXISTS menu (" +
                                    "id INT AUTO_INCREMENT PRIMARY KEY, " +
                                    "name VARCHAR(255), " +
                                    "description VARCHAR(255), " +
-                                   "price DOUBLE)";
+                                   "price DOUBLE, " +
+                                   "image MEDIUMBLOB)";
         String createOrdersTable = "CREATE TABLE IF NOT EXISTS orders (" +
                                    "id INT AUTO_INCREMENT PRIMARY KEY, " +
                                    "table_number INT, " +
                                    "name VARCHAR(255), " +
-                                   "quantity INT)";
+                                   "quantity INT, " +
+                                   "price DOUBLE)";
 
         try (Statement statement = getConnection().createStatement()) {
             statement.execute(createMenuTable);
             statement.execute(createOrdersTable);
         }
+
+        // Check if the menu table is empty before importing data
+        if (isTableEmpty("menu")) {
+            importMenuData();
+        }
+    }
+
+    private boolean isTableEmpty(String tableName) throws SQLException {
+        String query = "SELECT COUNT(*) FROM " + tableName;
+        try (Statement statement = getConnection().createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            if (resultSet.next()) {
+                return resultSet.getInt(1) == 0;
+            }
+        }
+        return false;
     }
 
     public void insertMenuItem(MenuItem menuItem) throws SQLException {
-        String insertMenuItemSQL = "INSERT INTO menu (name, description, price) VALUES (?, ?, ?)";
+        String insertMenuItemSQL = "INSERT INTO menu (name, description, price, image) VALUES (?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(insertMenuItemSQL)) {
             preparedStatement.setString(1, menuItem.getName());
             preparedStatement.setString(2, menuItem.getDescription());
             preparedStatement.setDouble(3, menuItem.getPrice());
+            preparedStatement.setBytes(4, menuItem.getImage());
             preparedStatement.executeUpdate();
         }
     }
@@ -80,8 +104,9 @@ public class DatabaseUtil {
                 String name = resultSet.getString("name");
                 String description = resultSet.getString("description");
                 double price = resultSet.getDouble("price");
+                byte[] image = resultSet.getBytes("image");
 
-                MenuItem menuItem = new MenuItem(id, name, description, price);
+                MenuItem menuItem = new MenuItem(id, name, description, price, image);
                 menuItems.add(menuItem);
             }
         }
@@ -97,9 +122,50 @@ public class DatabaseUtil {
                 int tableNumber = resultSet.getInt("table_number");
                 String name = resultSet.getString("name");
                 int quantity = resultSet.getInt("quantity");
-                orders.add(new Order(tableNumber, name, quantity, 0));
+                double price = resultSet.getDouble("price");
+                orders.add(new Order(tableNumber, name, quantity, price));
             }
         }
         return orders;
+    }
+
+    public static void importMenuData() throws SQLException, IOException {
+        String insertSQL = "INSERT INTO menu (name, description, price, image) VALUES (?, ?, ?, ?)";
+        
+        String csvFile = "src/main/java/foodorderingsystem/Others/menu.csv";
+        String line;
+        boolean firstLine = true;
+    
+        try (Connection conn = getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(insertSQL);
+             BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+    
+            while ((line = br.readLine()) != null) {
+                if (firstLine) {
+                    firstLine = false;
+                    continue;
+                }
+    
+                String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                
+                pstmt.setString(1, data[0].trim());
+                pstmt.setString(2, data[1].trim().replace("\"", ""));
+                pstmt.setDouble(3, Double.parseDouble(data[2].trim()));
+    
+                // Improved image loading with proper resource management
+                String imagePath = "src/main/resources/" + data[3].trim();
+                File imageFile = new File(imagePath);
+                if (imageFile.exists()) {
+                    try (FileInputStream fis = new FileInputStream(imageFile)) {
+                        pstmt.setBinaryStream(4, fis, imageFile.length());
+                        pstmt.executeUpdate();
+                    }
+                } else {
+                    System.out.println("Image not found: " + imagePath);
+                    pstmt.setBytes(4, new byte[0]);
+                    pstmt.executeUpdate();
+                }
+            }
+        }
     }
 }

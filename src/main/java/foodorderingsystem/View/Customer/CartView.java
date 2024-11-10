@@ -13,15 +13,13 @@ import javafx.stage.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+import java.io.ByteArrayInputStream;
 import java.util.Map;
 
 public class CartView extends UI {
 
-    private final Image[] images;
-
-    public CartView(Controller controller, Image[] images) {
+    public CartView(Controller controller) {
         super(controller);
-        this.images = images;
     }
 
     @Override
@@ -59,7 +57,8 @@ public class CartView extends UI {
                 itemGrid.setPadding(new Insets(10, 10, 10, 10));
                 itemGrid.setStyle("-fx-background-color: #f9f9f9; -fx-border-color: #ccc; -fx-border-width: 1px;");
 
-                ImageView imageView = new ImageView(images[item.getID() - 1]);
+                // Retrieve the image from the database
+                ImageView imageView = new ImageView(new Image(new ByteArrayInputStream(item.getImage())));
                 imageView.setFitWidth(100);
                 imageView.setFitHeight(100);
                 GridPane.setConstraints(imageView, 0, 0, 1, 4);

@@ -1,5 +1,8 @@
 package foodorderingsystem.Controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -46,14 +49,27 @@ public class Controller {
 
     // Add more business logic methods here
 
-    public void insertMenuItem(int id, String name, String description, double price) {
+    public void insertMenuItem(int id, String name, String description, double price, String imagePath) {
         try {
-            MenuItem menuItem = new MenuItem(id, name, description, price);
+            byte[] imageBytes = loadImage(imagePath);
+            MenuItem menuItem = new MenuItem(id, name, description, price, imageBytes);
             databaseUtil.insertMenuItem(menuItem);
             System.out.println("Menu item inserted: " + name);
-        } catch (SQLException e) {
+        } catch (SQLException | IOException e) {
             // Handle the exception more gracefully
             System.err.println("Error inserting menu item: " + e.getMessage());
+        }
+    }
+
+    private byte[] loadImage(String imagePath) throws IOException {
+        File imageFile = new File(imagePath);
+        if (imageFile.exists()) {
+            try (FileInputStream fis = new FileInputStream(imageFile)) {
+                return fis.readAllBytes();
+            }
+        } else {
+            System.err.println("Image not found: " + imagePath);
+            return new byte[0];
         }
     }
 
