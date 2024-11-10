@@ -97,7 +97,7 @@ public class DatabaseUtil {
                 int tableNumber = resultSet.getInt("table_number");
                 String name = resultSet.getString("name");
                 int quantity = resultSet.getInt("quantity");
-                orders.add(new Order(tableNumber, name, quantity));
+                orders.add(new Order(tableNumber, name, quantity, 0));
             }
         }
         return orders;

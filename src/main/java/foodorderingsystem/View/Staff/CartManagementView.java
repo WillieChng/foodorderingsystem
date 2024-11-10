@@ -112,10 +112,9 @@ public class CartManagementView extends Application {
 
                     Button clearButton = new Button("Clear");
                     clearButton.setOnAction(e -> {
-                        // Remove the item from the orders table and refresh the view
-                        controller.removeItemFromOrders(tableNumber, name);
-                        System.out.println("Debug: Removed item: " + name + " from table number: " + tableNumber);
-                        start(primaryStage); // Refresh the view
+                        // Remove the item from the screen display
+                        listViewWithButtons.getChildren().remove(itemGrid);
+                        System.out.println("Debug: Removed item grid for item: " + name + " from screen display");
                     });
                     GridPane.setConstraints(clearButton, 1, 2);
                     System.out.println("Debug: Created clear button for item: " + name);

@@ -17,11 +17,11 @@ import java.util.List;
 public class MenuView extends UI {
 
     private static final Image[] IMAGES = {
-            new Image("file:src/main/resources/images/Image1.png"),
-            new Image("file:src/main/resources/images/Image2.png"),
-            new Image("file:src/main/resources/images/Image3.png"),
-            new Image("file:src/main/resources/images/Image4.png"),
-            new Image("file:src/main/resources/images/Image5.png")
+        new Image("file:src/main/resources/images/SpicyChickenTacos.png"),
+        new Image("file:src/main/resources/images/ClassicMargheritaPizza.png"),
+        new Image("file:src/main/resources/images/VeganBuddhaBowl.png"),
+        new Image("file:src/main/resources/images/BeefRamenNoodleBowl.png"),
+        new Image("file:src/main/resources/images/BerryAcaiSmoothieBowl.png")
     };
 
     public MenuView(Controller controller) {

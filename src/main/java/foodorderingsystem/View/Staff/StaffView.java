@@ -50,6 +50,12 @@ public class StaffView extends Application {
             cartManagementView.start(primaryStage);
         });
 
+        // Add event handler to the "Generate Receipt" button
+        generateReceiptButton.setOnAction(e -> {
+            StaffTableSelectionView tableSelectionView = new StaffTableSelectionView(controller);
+            tableSelectionView.start(primaryStage);
+        });
+
         // Create VBox and set alignment and spacing
         VBox vbox = new VBox(20, cartManagementButton, generateReceiptButton, manageMenuButton);
         vbox.setAlignment(Pos.CENTER);
@@ -60,9 +66,5 @@ public class StaffView extends Application {
         primaryStage.setScene(scene);
         primaryStage.setTitle("Staff Main Page");
         primaryStage.show();
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }

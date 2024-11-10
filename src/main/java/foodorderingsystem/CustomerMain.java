@@ -19,11 +19,12 @@ public class CustomerMain extends Application {
     public void start(Stage primaryStage) {
         // Open the foodorderingsystem.Model package to javafx.base at runtime
         ModuleLayer.boot().findModule("foodorderingsystem").ifPresent(module -> {
-            module.addOpens("foodorderingsystem.Model", ModuleLayer.boot().findModule("javafx.base").orElseThrow());
+            module.addOpens("foodorderingsystem.Model.Customer", ModuleLayer.boot().findModule("javafx.base").orElseThrow());
+            module.addOpens("foodorderingsystem.Model.Staff", ModuleLayer.boot().findModule("javafx.base").orElseThrow());
         });
 
         // Create an Order object
-        Order order = new Order(0, null, 0);
+        Order order = new Order(0, null, 0, 0);
 
         try {
             // Create a Database Connection

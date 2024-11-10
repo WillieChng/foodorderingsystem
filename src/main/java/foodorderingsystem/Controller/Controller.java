@@ -105,7 +105,7 @@ public class Controller {
                 String name = resultSet.getString("name");
                 int quantity = resultSet.getInt("quantity");
 
-                Order order = new Order(tableNumber, name, quantity);
+                Order order = new Order(tableNumber, name, quantity, 0);
 
                 orders.computeIfAbsent(tableNumber, k -> new ArrayList<>()).add(order);
             }
@@ -129,7 +129,7 @@ public class Controller {
 
     public void checkout() {
         try {
-            String sql = "INSERT INTO orders (table_number, name, quantity) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO orders (table_number, name, quantity, price) VALUES (?, ?, ?, ?)";
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                 for (Map.Entry<MenuItem, Integer> entry : cart.getItems().entrySet()) {
                     MenuItem item = entry.getKey();
@@ -137,6 +137,7 @@ public class Controller {
                     preparedStatement.setInt(1, order.getTableNumber());
                     preparedStatement.setString(2, item.getName());
                     preparedStatement.setInt(3, quantity);
+                    preparedStatement.setDouble(4, item.getPrice() * quantity);
                     preparedStatement.addBatch();
                 }
                 preparedStatement.executeBatch();
@@ -154,6 +155,41 @@ public class Controller {
             } catch (SQLException e) {
                 System.err.println("Error closing connection: " + e.getMessage());
             }
+        }
+    }
+
+    // New method to get orders for a specific table number
+    public List<Order> getOrdersForTable(int tableNumber) {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT table_number, name, quantity, price FROM orders WHERE table_number = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, tableNumber);
+            System.out.println("Debug: Executing query: " + preparedStatement);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String name = resultSet.getString("name");
+                    int quantity = resultSet.getInt("quantity");
+                    int price = resultSet.getInt("price");
+                    Order order = new Order(tableNumber, name, quantity, price);
+                    orders.add(order);
+                    System.out.println("Debug: Retrieved order: " + order);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving orders for table: " + e.getMessage());
+        }
+        return orders;
+    }
+
+    // New method to remove orders for a specific table number
+    public void removeOrdersForTable(int tableNumber) {
+        String sql = "DELETE FROM orders WHERE table_number = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, tableNumber);
+            int rowsDeleted = preparedStatement.executeUpdate();
+            System.out.println("Debug: Removed " + rowsDeleted + " order(s) for table number " + tableNumber);
+        } catch (SQLException e) {
+            System.err.println("Error removing orders for table: " + e.getMessage());
         }
     }
 }

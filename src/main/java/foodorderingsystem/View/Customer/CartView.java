@@ -130,6 +130,8 @@ public class CartView extends UI {
             // Handle checkout logic here
             controller.checkout();
             System.out.println("Proceeding to checkout...");
+            ThankYouView thankYouView = new ThankYouView(controller);
+            thankYouView.start(primaryStage);
         });
 
         // Add all components to the grid
