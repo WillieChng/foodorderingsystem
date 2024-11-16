@@ -101,7 +101,7 @@ public class ManageMenuView extends UI {
                     System.out.println("Update item: " + item.getName());
                 });
                 GridPane.setConstraints(updateButton, 1, 4);
-                
+
                 itemGrid.getChildren().addAll(imageView, nameLabel, descriptionLabel, priceLabel, removeButton, updateButton);
                 listViewWithButtons.getChildren().add(itemGrid);
             }

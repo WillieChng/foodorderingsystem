@@ -86,13 +86,9 @@ public class CartManagementView extends Application {
                     // Retrieve the image from the order
                     byte[] imageBytes = order.getImage();
                     Image image;
-                    if (imageBytes != null && imageBytes.length > 0) {
-                        image = new Image(new ByteArrayInputStream(imageBytes));
-                        System.out.println("Debug: Found image for item: " + name);
-                    } else {
-                        System.out.println("Debug: Image not found for item: " + name + ", using default image.");
-                        image = new Image("file:src/main/resources/images/default.png");
-                    }
+                    image = new Image(new ByteArrayInputStream(imageBytes));
+                    System.out.println("Debug: Found image for item: " + name);
+
                     ImageView imageView = new ImageView(image);
                     imageView.setFitWidth(100);
                     imageView.setFitHeight(100);

@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseUtil {
-    private static final String URL = "jdbc:mysql://localhost:3306/fos_db";
-    private static final String USER = "root";
-    private static final String PASSWORD = "li852456";
+    private static final String URL = "jdbc:mysql://" + EnvLoader.getEnv("DB_HOST") + ":" + EnvLoader.getEnv("DB_PORT") + "/" + EnvLoader.getEnv("DB_NAME");
+    private static final String USER = EnvLoader.getEnv("DB_USER");
+    private static final String PASSWORD = EnvLoader.getEnv("DB_PASSWORD");
     private static DatabaseUtil instance;
     private Connection connection;
 
@@ -49,19 +49,19 @@ public class DatabaseUtil {
 
     public void createTables() throws SQLException, IOException {
         String createMenuTable = "CREATE TABLE IF NOT EXISTS menu (" +
-                                   "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                                   "name VARCHAR(255), " +
-                                   "description VARCHAR(255), " +
-                                   "price DOUBLE, " +
-                                   "image MEDIUMBLOB)";
+                "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                "name VARCHAR(255), " +
+                "description VARCHAR(255), " +
+                "price DOUBLE, " +
+                "image MEDIUMBLOB)";
         String createOrdersTable = "CREATE TABLE IF NOT EXISTS orders (" +
-                                   "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                                   "table_number INT, " +
-                                   "name VARCHAR(255), " +
-                                   "quantity INT, " +
-                                   "price DOUBLE, " +
-                                   "image MEDIUMBLOB, " +
-                                   "served_status BOOLEAN DEFAULT FALSE)";
+                "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                "table_number INT, " +
+                "name VARCHAR(255), " +
+                "quantity INT, " +
+                "price DOUBLE, " +
+                "image MEDIUMBLOB, " +
+                "served_status BOOLEAN DEFAULT FALSE)";
 
         try (Statement statement = getConnection().createStatement()) {
             statement.execute(createMenuTable);
@@ -127,7 +127,7 @@ public class DatabaseUtil {
                 double price = resultSet.getDouble("price");
                 byte[] image = resultSet.getBytes("image");
                 boolean isServed = resultSet.getBoolean("served_status");
-                
+
                 orders.add(new Order(tableNumber, name, quantity, price, image, isServed));
             }
         }
@@ -136,27 +136,27 @@ public class DatabaseUtil {
 
     public static void importMenuData() throws SQLException, IOException {
         String insertSQL = "INSERT INTO menu (name, description, price, image) VALUES (?, ?, ?, ?)";
-        
+
         String csvFile = "src/main/java/foodorderingsystem/Others/menu.csv";
         String line;
         boolean firstLine = true;
-    
+
         try (Connection conn = getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(insertSQL);
              BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
-    
+
             while ((line = br.readLine()) != null) {
                 if (firstLine) {
                     firstLine = false;
                     continue;
                 }
-    
+
                 String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
-                
+
                 pstmt.setString(1, data[0].trim());
                 pstmt.setString(2, data[1].trim().replace("\"", ""));
                 pstmt.setDouble(3, Double.parseDouble(data[2].trim()));
-    
+
                 // Improved image loading with proper resource management
                 String imagePath = "src/main/resources/" + data[3].trim();
                 File imageFile = new File(imagePath);

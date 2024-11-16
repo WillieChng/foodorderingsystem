@@ -97,7 +97,7 @@ public class Controller {
     public void addItemToCart(MenuItem item) {
         Map<MenuItem, Integer> cartItems = cart.getItems();
         boolean itemExists = false;
-    
+
         for (Map.Entry<MenuItem, Integer> entry : cartItems.entrySet()) {
             MenuItem cartItem = entry.getKey();
             if (cartItem.getName().equals(item.getName())) {
@@ -108,7 +108,7 @@ public class Controller {
                 break;
             }
         }
-    
+
         if (!itemExists) {
             cartItems.put(item, 1);
             System.out.println("Added new item to cart: " + item.getName());
@@ -202,12 +202,12 @@ public class Controller {
                 preparedStatement.executeBatch();
                 System.out.println("Checkout completed: Order saved to database.");
             }
-        // Clear the cart after checkout
-        clearCart(); 
-    } catch (SQLException e) {
+            // Clear the cart after checkout
+            clearCart();
+        } catch (SQLException e) {
             System.err.println("Error during checkout: " + e.getMessage());
+        }
     }
-}
 
     public void closeConnection() {
         if (connection != null) {
@@ -269,8 +269,8 @@ public class Controller {
         }
     }
 
-     // New method to display a pop-up form for updating a menu item
-     public void showUpdateMenuItemForm(MenuItem menuItem) {
+    // New method to display a pop-up form for updating a menu item
+    public void showUpdateMenuItemForm(MenuItem menuItem) {
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setTitle("Update Menu Item");
@@ -369,92 +369,92 @@ public class Controller {
     }
 
     // New method to display a pop-up form for adding a new menu item
-public void showAddMenuItemForm() {
-    Stage stage = new Stage();
-    stage.initModality(Modality.APPLICATION_MODAL);
-    stage.setTitle("Add Menu Item");
+    public void showAddMenuItemForm() {
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle("Add Menu Item");
 
-    GridPane grid = new GridPane();
-    grid.setAlignment(Pos.CENTER);
-    grid.setPadding(new Insets(10, 10, 10, 10));
-    grid.setHgap(10);
-    grid.setVgap(10);
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setHgap(10);
+        grid.setVgap(10);
 
-    // Image
-    ImageView imageView = new ImageView();
-    imageView.setFitWidth(100);
-    imageView.setFitHeight(100);
-    grid.add(new Label("Image:"), 0, 0);
-    grid.add(imageView, 1, 0);
+        // Image
+        ImageView imageView = new ImageView();
+        imageView.setFitWidth(100);
+        imageView.setFitHeight(100);
+        grid.add(new Label("Image:"), 0, 0);
+        grid.add(imageView, 1, 0);
 
-    // Button to choose a new image
-    Button chooseImageButton = new Button("Choose Image");
-    grid.add(chooseImageButton, 2, 0);
+        // Button to choose a new image
+        Button chooseImageButton = new Button("Choose Image");
+        grid.add(chooseImageButton, 2, 0);
 
-    // Name
-    TextField nameField = new TextField();
-    grid.add(new Label("Name:"), 0, 1);
-    grid.add(nameField, 1, 1);
+        // Name
+        TextField nameField = new TextField();
+        grid.add(new Label("Name:"), 0, 1);
+        grid.add(nameField, 1, 1);
 
-    // Description
-    TextField descriptionField = new TextField();
-    grid.add(new Label("Description:"), 0, 2);
-    grid.add(descriptionField, 1, 2);
+        // Description
+        TextField descriptionField = new TextField();
+        grid.add(new Label("Description:"), 0, 2);
+        grid.add(descriptionField, 1, 2);
 
-    // Price
-    TextField priceField = new TextField();
-    grid.add(new Label("Price:"), 0, 3);
-    grid.add(priceField, 1, 3);
+        // Price
+        TextField priceField = new TextField();
+        grid.add(new Label("Price:"), 0, 3);
+        grid.add(priceField, 1, 3);
 
-    // File chooser for selecting a new image
-    FileChooser fileChooser = new FileChooser();
-    fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
+        // File chooser for selecting a new image
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
 
-    // Store the new image bytes
-    final byte[][] newImageBytes = {null};
+        // Store the new image bytes
+        final byte[][] newImageBytes = {null};
 
-    chooseImageButton.setOnAction(e -> {
-        File selectedFile = fileChooser.showOpenDialog(stage);
-        if (selectedFile != null) {
-            try {
-                newImageBytes[0] = loadImage(selectedFile.getAbsolutePath());
-                imageView.setImage(new Image(new ByteArrayInputStream(newImageBytes[0])));
-            } catch (IOException ex) {
-                ex.printStackTrace();
+        chooseImageButton.setOnAction(e -> {
+            File selectedFile = fileChooser.showOpenDialog(stage);
+            if (selectedFile != null) {
+                try {
+                    newImageBytes[0] = loadImage(selectedFile.getAbsolutePath());
+                    imageView.setImage(new Image(new ByteArrayInputStream(newImageBytes[0])));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
-        }
-    });
+        });
 
-    // Add Button
-    Button addButton = new Button("Add");
-    addButton.setOnAction(e -> {
-        String name = nameField.getText();
-        String description = descriptionField.getText();
-        String priceText = priceField.getText();
+        // Add Button
+        Button addButton = new Button("Add");
+        addButton.setOnAction(e -> {
+            String name = nameField.getText();
+            String description = descriptionField.getText();
+            String priceText = priceField.getText();
 
-        if (name.isEmpty() || description.isEmpty() || priceText.isEmpty() || newImageBytes[0] == null) {
-            // Show an error message if any field is empty
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText(null);
-            alert.setContentText("All fields must be filled!");
-            alert.showAndWait();
-        } else {
-            double price = Double.parseDouble(priceText);
-            MenuItem menuItem = new MenuItem(0, name, description, price, newImageBytes[0]);
-            try {
-                databaseUtil.insertMenuItem(menuItem);
-                System.out.println("Menu item added: " + name);
-                stage.close();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+            if (name.isEmpty() || description.isEmpty() || priceText.isEmpty() || newImageBytes[0] == null) {
+                // Show an error message if any field is empty
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText("All fields must be filled!");
+                alert.showAndWait();
+            } else {
+                double price = Double.parseDouble(priceText);
+                MenuItem menuItem = new MenuItem(0, name, description, price, newImageBytes[0]);
+                try {
+                    databaseUtil.insertMenuItem(menuItem);
+                    System.out.println("Menu item added: " + name);
+                    stage.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
             }
-        }
-    });
-    grid.add(addButton, 1, 4);
+        });
+        grid.add(addButton, 1, 4);
 
-    Scene scene = new Scene(grid, 400, 300);
-    stage.setScene(scene);
-    stage.showAndWait();
-}
+        Scene scene = new Scene(grid, 400, 300);
+        stage.setScene(scene);
+        stage.showAndWait();
+    }
 }

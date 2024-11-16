@@ -2,6 +2,7 @@ package foodorderingsystem.View.Customer;
 
 import foodorderingsystem.Controller.Controller;
 import javafx.geometry.*;
+import foodorderingsystem.View.UI;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -11,14 +12,13 @@ import javafx.stage.Stage;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
-public class ThankYouView {
-
-    private final Controller controller;
+public class ThankYouView extends UI {
 
     public ThankYouView(Controller controller) {
-        this.controller = controller;
+        super(controller);
     }
 
+    @Override
     public void start(Stage primaryStage) {
         // Create a VBox layout for the thank you page
         VBox thankYouBox = new VBox(20);
