@@ -53,7 +53,7 @@ public class ReceiptView {
                 Label orderLabel = new Label(itemNumber + ". " + order.toString());
                 orderLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 20));
                 receiptBox.getChildren().add(orderLabel);
-                totalSum += order.getQuantity() * order.getPrice();
+                totalSum += order.getPrice();
                 itemNumber++;
             }
 

@@ -95,13 +95,28 @@ public class Controller {
     }
 
     public void addItemToCart(MenuItem item) {
-        cart.addItem(item);
+        Map<MenuItem, Integer> cartItems = cart.getItems();
+        boolean itemExists = false;
+    
+        for (Map.Entry<MenuItem, Integer> entry : cartItems.entrySet()) {
+            MenuItem cartItem = entry.getKey();
+            if (cartItem.getName().equals(item.getName())) {
+                int newQuantity = entry.getValue() + 1;
+                cartItems.put(cartItem, newQuantity);
+                itemExists = true;
+                System.out.println("Updated quantity for item: " + cartItem.getName() + " to " + newQuantity);
+                break;
+            }
+        }
+    
+        if (!itemExists) {
+            cartItems.put(item, 1);
+            System.out.println("Added new item to cart: " + item.getName());
+        }
     }
 
     public void removeItemFromCart(MenuItem item) {
         cart.removeItem(item);
-        // Optionally, remove the item from the database if needed
-        // databaseUtil.removeMenuItem(item);
     }
 
     public Map<MenuItem, Integer> getCartItems() {
@@ -110,6 +125,7 @@ public class Controller {
 
     public void clearCart() {
         cart.clear();
+        System.out.println("Cart cleared.");
     }
 
     public List<Order> getOrders() {
@@ -186,10 +202,12 @@ public class Controller {
                 preparedStatement.executeBatch();
                 System.out.println("Checkout completed: Order saved to database.");
             }
-        } catch (SQLException e) {
+        // Clear the cart after checkout
+        clearCart(); 
+    } catch (SQLException e) {
             System.err.println("Error during checkout: " + e.getMessage());
-        }
     }
+}
 
     public void closeConnection() {
         if (connection != null) {

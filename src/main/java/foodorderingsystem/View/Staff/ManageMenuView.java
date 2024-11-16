@@ -71,10 +71,25 @@ public class ManageMenuView extends UI {
 
                 Button removeButton = new Button("Remove From Menu");
                 removeButton.setOnAction(e -> {
-                    // Remove the item from the menu
-                    controller.removeMenuItem(item);
-                    start(primaryStage); // Refresh the view
-                    System.out.println("Removed from menu: " + item.getName());
+                    // Display confirmation dialog
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Confirmation");
+                    alert.setHeaderText("Remove Item");
+                    alert.setContentText("Are you sure you want to remove " + item.getName() + " from the menu?");
+
+                    ButtonType buttonTypeYes = new ButtonType("Yes");
+                    ButtonType buttonTypeNo = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                    alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+
+                    alert.showAndWait().ifPresent(type -> {
+                        if (type == buttonTypeYes) {
+                            // Remove the item from the menu
+                            controller.removeMenuItem(item);
+                            start(primaryStage); // Refresh the view
+                            System.out.println("Removed from menu: " + item.getName());
+                        }
+                    });
                 });
                 GridPane.setConstraints(removeButton, 1, 3);
 

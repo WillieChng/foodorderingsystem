@@ -1,5 +1,10 @@
 package foodorderingsystem.View.Staff;
 
+import foodorderingsystem.Commands.CartManagementCommand;
+import foodorderingsystem.Commands.Command;
+import foodorderingsystem.Commands.GenerateReceiptCommand;
+import foodorderingsystem.Commands.Invoker;
+import foodorderingsystem.Commands.ManageMenuCommand;
 import foodorderingsystem.Controller.Controller;
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -35,23 +40,26 @@ public class StaffView extends Application {
         generateReceiptButton.setStyle("-fx-font-size: 20px; -fx-padding: 15px;");
         manageMenuButton.setStyle("-fx-font-size: 20px; -fx-padding: 15px;");
 
-        // Add event handler to the "Cart Management" button
+        // Create command objects
+        Command cartManagementCommand = new CartManagementCommand(controller, primaryStage);
+        Command generateReceiptCommand = new GenerateReceiptCommand(controller, primaryStage);
+        Command manageMenuCommand = new ManageMenuCommand(controller, primaryStage);
+
+        // Create an Invoker
+        Invoker invoker = new Invoker();
+
+        // Add event handlers to the buttons
         cartManagementButton.setOnAction(e -> {
-            CartManagementView cartManagementView = new CartManagementView();
-            cartManagementView.setController(controller);
-            cartManagementView.start(primaryStage);
+            invoker.setCommand(cartManagementCommand);
+            invoker.executeCommand();
         });
-
-        // Add event handler to the "Generate Receipt" button
         generateReceiptButton.setOnAction(e -> {
-            StaffTableSelectionView tableSelectionView = new StaffTableSelectionView(controller);
-            tableSelectionView.start(primaryStage);
+            invoker.setCommand(generateReceiptCommand);
+            invoker.executeCommand();
         });
-
-        // Add event handler to the "Manage Menu" button
         manageMenuButton.setOnAction(e -> {
-            ManageMenuView manageMenuView = new ManageMenuView(controller);
-            manageMenuView.start(primaryStage);
+            invoker.setCommand(manageMenuCommand);
+            invoker.executeCommand();
         });
 
         // Create VBox and set alignment and spacing

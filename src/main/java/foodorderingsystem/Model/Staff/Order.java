@@ -8,7 +8,7 @@ public class Order {
     private byte[] image; // Add an image field
     private boolean servedStatus;
 
-    public Order(int tableNumber, String name, int quantity, double price, byte[] image, boolean isServed) {
+    public Order(int tableNumber, String name, int quantity, double price, byte[] image, boolean servedStatus) {
         this.tableNumber = tableNumber;
         this.name = name;
         this.quantity = quantity;
