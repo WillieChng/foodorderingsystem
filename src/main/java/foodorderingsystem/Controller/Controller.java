@@ -124,7 +124,7 @@ public class Controller {
 
     public Map<Integer, List<Order>> getItemsFromOrders() {
         Map<Integer, List<Order>> orders = new HashMap<>();
-        String sql = "SELECT table_number, name, quantity, price, image FROM orders";
+        String sql = "SELECT table_number, name, quantity, price, image, served_status FROM orders WHERE served_status = false";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql);
              ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
@@ -133,8 +133,9 @@ public class Controller {
                 int quantity = resultSet.getInt("quantity");
                 double price = resultSet.getDouble("price");
                 byte[] image = resultSet.getBytes("image");
+                boolean isServed = resultSet.getBoolean("served_status");
 
-                Order order = new Order(tableNumber, name, quantity, price, image);
+                Order order = new Order(tableNumber, name, quantity, price, image, isServed);
 
                 orders.computeIfAbsent(tableNumber, k -> new ArrayList<>()).add(order);
             }
@@ -142,6 +143,18 @@ public class Controller {
             System.err.println("Error retrieving items from orders: " + e.getMessage());
         }
         return orders;
+    }
+
+    public void markOrderAsServed(Order order) {
+        String sql = "UPDATE orders SET served_status = true WHERE table_number = ? AND name = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, order.getTableNumber());
+            preparedStatement.setString(2, order.getName());
+            int rowsUpdated = preparedStatement.executeUpdate();
+            System.out.println("Debug: Marked " + rowsUpdated + " order(s) as served for table number " + order.getTableNumber() + " and name " + order.getName());
+        } catch (SQLException e) {
+            System.err.println("Error marking order as served: " + e.getMessage());
+        }
     }
 
     public void removeItemFromOrders(int tableNumber, String name) {
@@ -191,7 +204,7 @@ public class Controller {
     // New method to get orders for a specific table number
     public List<Order> getOrdersForTable(int tableNumber) {
         List<Order> orders = new ArrayList<>();
-        String sql = "SELECT table_number, name, quantity, price, image FROM orders WHERE table_number = ?";
+        String sql = "SELECT table_number, name, quantity, price, image, served_status FROM orders WHERE table_number = ? AND served_status = true";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, tableNumber);
             System.out.println("Debug: Executing query: " + preparedStatement);
@@ -201,7 +214,9 @@ public class Controller {
                     int quantity = resultSet.getInt("quantity");
                     double price = resultSet.getDouble("price");
                     byte[] image = resultSet.getBytes("image");
-                    Order order = new Order(tableNumber, name, quantity, price, image);
+                    boolean isServed = resultSet.getBoolean("served_status");
+
+                    Order order = new Order(tableNumber, name, quantity, price, image, isServed);
                     orders.add(order);
                     System.out.println("Debug: Retrieved order: " + order);
                 }

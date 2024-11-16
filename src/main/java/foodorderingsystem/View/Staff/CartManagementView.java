@@ -2,6 +2,8 @@ package foodorderingsystem.View.Staff;
 
 import foodorderingsystem.Controller.Controller;
 import foodorderingsystem.Model.Staff.Order;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.geometry.*;
 import javafx.scene.*;
@@ -12,6 +14,7 @@ import javafx.scene.layout.*;
 import javafx.stage.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.util.Duration;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -19,6 +22,7 @@ import java.util.Map;
 
 public class CartManagementView extends Application {
     private Controller controller;
+    private Timeline timeline;
 
     public CartManagementView() {
         // No-argument constructor required by JavaFX
@@ -106,6 +110,8 @@ public class CartManagementView extends Application {
 
                     Button clearButton = new Button("Clear");
                     clearButton.setOnAction(e -> {
+                        // Mark the order as served
+                        controller.markOrderAsServed(order);
                         // Remove the item from the screen display
                         listViewWithButtons.getChildren().remove(itemGrid);
                         System.out.println("Debug: Removed item grid for item: " + name + " from screen display");
@@ -142,6 +148,10 @@ public class CartManagementView extends Application {
 
         // Add event handler to switch views
         backButton.setOnAction(e -> {
+            // Stop the timeline when switching views
+            if (timeline != null) {
+                timeline.stop();
+            }
             StaffView staffView = new StaffView(controller);
             staffView.start(primaryStage);
             System.out.println("Debug: Switched to StaffView");
@@ -164,5 +174,26 @@ public class CartManagementView extends Application {
         primaryStage.setTitle("Cart Management");
         primaryStage.show();
         System.out.println("Debug: Showed primary stage");
+
+        // Refresh the page every 5 seconds
+        timeline = new Timeline(new KeyFrame(Duration.seconds(5), e -> refresh(primaryStage)));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+    }
+
+    private void refresh(Stage primaryStage) {
+        // Stop the timeline to prevent multiple refreshes
+        if (timeline != null) {
+            timeline.stop();
+        }
+        start(primaryStage);
+    }
+
+    @Override
+    public void stop() {
+        // Stop the timeline when the application exits
+        if (timeline != null) {
+            timeline.stop();
+        }
     }
 }

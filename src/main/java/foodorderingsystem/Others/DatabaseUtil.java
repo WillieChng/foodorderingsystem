@@ -60,7 +60,8 @@ public class DatabaseUtil {
                                    "name VARCHAR(255), " +
                                    "quantity INT, " +
                                    "price DOUBLE, " +
-                                   "image MEDIUMBLOB)";
+                                   "image MEDIUMBLOB, " +
+                                   "served_status BOOLEAN DEFAULT FALSE)";
 
         try (Statement statement = getConnection().createStatement()) {
             statement.execute(createMenuTable);
@@ -125,8 +126,9 @@ public class DatabaseUtil {
                 int quantity = resultSet.getInt("quantity");
                 double price = resultSet.getDouble("price");
                 byte[] image = resultSet.getBytes("image");
+                boolean isServed = resultSet.getBoolean("served_status");
                 
-                orders.add(new Order(tableNumber, name, quantity, price, image));
+                orders.add(new Order(tableNumber, name, quantity, price, image, isServed));
             }
         }
         return orders;

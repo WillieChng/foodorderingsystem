@@ -17,7 +17,7 @@ public class StaffMain extends Application {
     @Override
     public void start(Stage primaryStage) {
         // Create an Order object
-        Order order = new Order(0, null, 0, 0, null);
+        Order order = new Order(0, null, 0, 0, null, false);
 
         // Create a Controller object with the Order and Database Connection
         try {

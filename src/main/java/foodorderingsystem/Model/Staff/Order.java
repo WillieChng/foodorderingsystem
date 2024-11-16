@@ -6,13 +6,15 @@ public class Order {
     private int quantity;
     private double price; // Add a price field
     private byte[] image; // Add an image field
+    private boolean servedStatus;
 
-    public Order(int tableNumber, String name, int quantity, double price, byte[] image) {
+    public Order(int tableNumber, String name, int quantity, double price, byte[] image, boolean isServed) {
         this.tableNumber = tableNumber;
         this.name = name;
         this.quantity = quantity;
         this.price = price; // Initialize the price field
         this.image = image; // Initialize the image field
+        this.servedStatus = servedStatus;
     }
 
     public int getTableNumber() {
@@ -53,6 +55,14 @@ public class Order {
 
     public void setImage(byte[] image) {
         this.image = image;
+    }
+
+    public boolean getIsServed() {
+        return servedStatus;
+    }
+
+    public void setIsServed(boolean servedStatus) {
+        this.servedStatus = servedStatus;
     }
 
     @Override
