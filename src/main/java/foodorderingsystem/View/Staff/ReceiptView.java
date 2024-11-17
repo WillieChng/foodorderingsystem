@@ -30,8 +30,34 @@ public class ReceiptView extends UI {
         this.tableNumber = tableNumber;
     }
 
+    @Override
     public void start(Stage primaryStage) {
-        // Create a VBox layout for the receipt page
+        VBox receiptBox = createReceiptBox(primaryStage);
+
+        // Create a BorderPane to add a white frame around the receipt
+        BorderPane borderPane = new BorderPane();
+        borderPane.setCenter(receiptBox);
+        borderPane.setStyle("-fx-background-color: lightgray; -fx-padding: 20px;");
+
+        // Create a scene with the receipt page
+        Scene receiptScene = new Scene(borderPane);
+
+        // Set the scene to the primary stage
+        primaryStage.setScene(receiptScene);
+        primaryStage.setTitle("Receipt");
+
+        // Maximize the window size to fit the screen dimensions
+        Screen screen = Screen.getPrimary();
+        Rectangle2D bounds = screen.getVisualBounds();
+        primaryStage.setX(bounds.getMinX());
+        primaryStage.setY(bounds.getMinY());
+        primaryStage.setWidth(bounds.getWidth());
+        primaryStage.setHeight(bounds.getHeight());
+
+        primaryStage.show();
+    }
+
+    private VBox createReceiptBox(Stage primaryStage) {
         VBox receiptBox = new VBox(20);
         receiptBox.setAlignment(Pos.TOP_CENTER);
         receiptBox.setPadding(new Insets(20, 20, 20, 20));
@@ -73,14 +99,26 @@ public class ReceiptView extends UI {
         }
 
         // Create a "Paid" button
+        Button paidButton = createPaidButton(primaryStage);
+        receiptBox.getChildren().add(paidButton);
+
+        // Create a "Back" button
+        Button backButton = createBackButton(primaryStage);
+        receiptBox.getChildren().add(backButton);
+
+        return receiptBox;
+    }
+
+    private Button createPaidButton(Stage primaryStage) {
         Button paidButton = new Button("Paid");
         paidButton.setFont(new Font("Arial", 16));
         paidButton.setStyle("-fx-background-color: lightgray; -fx-text-fill: black; -fx-border-color: black; -fx-border-width: 4;");
         paidButton.setPrefSize(150, 50);
         paidButton.setOnAction(e -> showConfirmationDialog(primaryStage));
-        receiptBox.getChildren().add(paidButton);
+        return paidButton;
+    }
 
-        // Create a "Back" button
+    private Button createBackButton(Stage primaryStage) {
         Button backButton = new Button("Back");
         backButton.setFont(new Font("Arial", 16));
         backButton.setStyle("-fx-background-color: lightgray; -fx-text-fill: black; -fx-border-color: black; -fx-border-width: 4;");
@@ -89,29 +127,7 @@ public class ReceiptView extends UI {
             StaffTableSelectionView tableSelectionView = new StaffTableSelectionView(controller);
             tableSelectionView.start(primaryStage);
         });
-        receiptBox.getChildren().add(backButton);
-
-        // Create a BorderPane to add a white frame around the receipt
-        BorderPane borderPane = new BorderPane();
-        borderPane.setCenter(receiptBox);
-        borderPane.setStyle("-fx-background-color: lightgray; -fx-padding: 20px;");
-
-        // Create a scene with the receipt page
-        Scene receiptScene = new Scene(borderPane);
-
-        // Set the scene to the primary stage
-        primaryStage.setScene(receiptScene);
-        primaryStage.setTitle("Receipt");
-
-        // Maximize the window size to fit the screen dimensions
-        Screen screen = Screen.getPrimary();
-        Rectangle2D bounds = screen.getVisualBounds();
-        primaryStage.setX(bounds.getMinX());
-        primaryStage.setY(bounds.getMinY());
-        primaryStage.setWidth(bounds.getWidth());
-        primaryStage.setHeight(bounds.getHeight());
-
-        primaryStage.show();
+        return backButton;
     }
 
     private void showConfirmationDialog(Stage primaryStage) {

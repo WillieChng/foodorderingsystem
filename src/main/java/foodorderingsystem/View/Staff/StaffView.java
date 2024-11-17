@@ -8,19 +8,33 @@ import foodorderingsystem.Commands.Invoker;
 import foodorderingsystem.Commands.ManageMenuCommand;
 import foodorderingsystem.Controller.Controller;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class StaffView extends UI {
-  
+
     public StaffView(Controller controller) {
         super(controller);
     }
 
     @Override
     public void start(Stage primaryStage) {
+        GridPane grid = createGridPane();
+        VBox buttonBox = createButtonBox(primaryStage);
+
+        // Add all components to the grid
+        grid.getChildren().addAll(createHeader("Staff View"), buttonBox);
+
+        // Update the scene's root node
+        updateScene(primaryStage, grid);
+    }
+
+    private VBox createButtonBox(Stage primaryStage) {
+        VBox buttonBox = new VBox(20);
+        buttonBox.setAlignment(Pos.CENTER);
+
         // Create buttons
         Button cartManagementButton = new Button("Cart Management");
         Button generateReceiptButton = new Button("Generate Receipt");
@@ -36,10 +50,10 @@ public class StaffView extends UI {
         Command generateReceiptCommand = new GenerateReceiptCommand(controller, primaryStage);
         Command manageMenuCommand = new ManageMenuCommand(controller, primaryStage);
 
-        // Create an Invoker
+        // Create an invoker
         Invoker invoker = new Invoker();
 
-        // Add event handlers to the buttons
+        // Set button actions
         cartManagementButton.setOnAction(e -> {
             invoker.setCommand(cartManagementCommand);
             invoker.executeCommand();
@@ -53,15 +67,8 @@ public class StaffView extends UI {
             invoker.executeCommand();
         });
 
-        // Create VBox and set alignment and spacing
-        VBox vbox = new VBox(20, cartManagementButton, generateReceiptButton, manageMenuButton);
-        vbox.setAlignment(Pos.CENTER);
-        vbox.setStyle("-fx-background-color: beige;");
-
-        // Create scene and set stage
-        Scene scene = new Scene(vbox, 800, 600);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("Staff Main Page");
-        primaryStage.show();
+        buttonBox.getChildren().addAll(cartManagementButton, generateReceiptButton, manageMenuButton);
+        GridPane.setConstraints(buttonBox, 0, 1, 2, 1);
+        return buttonBox;
     }
 }
