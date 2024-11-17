@@ -27,10 +27,15 @@ public class CartView extends UI {
         VBox listViewWithButtons = createListViewWithButtons(primaryStage);
         ScrollPane scrollPane = createScrollPane(listViewWithButtons);
         Button backButton = createBackButton(primaryStage);
-        Button checkoutButton = createCheckoutButton(primaryStage);
 
         // Add all components to the grid
-        grid.getChildren().addAll(createHeader("Cart"), scrollPane, backButton, checkoutButton);
+        grid.getChildren().addAll(createHeader("Cart"), scrollPane, backButton);
+
+        // Conditionally add the checkout button if there are items in the cart
+        if (controller.getCartItems() != null && !controller.getCartItems().isEmpty()) {
+            Button checkoutButton = createCheckoutButton(primaryStage);
+            grid.getChildren().add(checkoutButton);
+        }
 
         // Update the scene's root node
         updateScene(primaryStage, grid);
@@ -39,6 +44,7 @@ public class CartView extends UI {
     private VBox createListViewWithButtons(Stage primaryStage) {
         VBox listViewWithButtons = new VBox(10);
         listViewWithButtons.setAlignment(Pos.CENTER);
+        listViewWithButtons.setPrefSize(600, 400); // Set preferred size to keep the container constant
 
         Map<MenuItem, Integer> cartItems = controller.getCartItems();
 

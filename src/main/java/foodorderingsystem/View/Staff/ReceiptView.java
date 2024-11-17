@@ -92,15 +92,15 @@ public class ReceiptView extends UI {
             Label totalLabel = new Label("Total: RM" + String.format("%.2f", totalSum));
             totalLabel.setFont(Font.font("Arial", FontWeight.BOLD, 30));
             receiptBox.getChildren().add(totalLabel);
+
+            // Create a "Paid" button
+            Button paidButton = createPaidButton(primaryStage);
+            receiptBox.getChildren().add(paidButton);
         } else {
             Label noOrdersLabel = new Label("No orders found for this table.");
             noOrdersLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 20));
             receiptBox.getChildren().add(noOrdersLabel);
         }
-
-        // Create a "Paid" button
-        Button paidButton = createPaidButton(primaryStage);
-        receiptBox.getChildren().add(paidButton);
 
         // Create a "Back" button
         Button backButton = createBackButton(primaryStage);

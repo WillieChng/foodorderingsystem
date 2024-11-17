@@ -8,9 +8,9 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.stage.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.*;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -27,9 +27,10 @@ public class ManageMenuView extends UI {
         VBox listViewWithButtons = createListViewWithButtons(primaryStage);
         ScrollPane scrollPane = createScrollPane(listViewWithButtons);
         Button backButton = createBackButton(primaryStage);
+        Button addItemButton = createAddItemButton(primaryStage);
 
         // Add all components to the grid
-        grid.getChildren().addAll(createHeader("Manage Menu"), scrollPane, backButton);
+        grid.getChildren().addAll(createHeader("Manage Menu"), scrollPane, backButton, addItemButton);
 
         // Update the scene's root node
         updateScene(primaryStage, grid);
@@ -45,10 +46,6 @@ public class ManageMenuView extends UI {
             for (MenuItem item : menuItems) {
                 listViewWithButtons.getChildren().add(createItemGrid(item, primaryStage));
             }
-        } else {
-            Label noItemsLabel = new Label("No Items Available :(");
-            noItemsLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-            listViewWithButtons.getChildren().add(noItemsLabel);
         }
 
         return listViewWithButtons;
@@ -76,21 +73,39 @@ public class ManageMenuView extends UI {
         Label priceLabel = new Label("RM" + item.getPrice());
         GridPane.setConstraints(priceLabel, 1, 2);
 
-        Button updateButton = new Button("Update");
-        updateButton.setOnAction(e -> {
-            // Implement update functionality
-        });
-        GridPane.setConstraints(updateButton, 1, 3);
+        Button removeButton = new Button("Remove From Menu");
+        removeButton.setOnAction(e -> showRemoveConfirmationDialog(item, primaryStage));
+        GridPane.setConstraints(removeButton, 1, 3);
 
-        Button deleteButton = new Button("Delete");
-        deleteButton.setOnAction(e -> {
-            controller.removeMenuItem(item);
+        Button updateButton = new Button("Update Information");
+        updateButton.setOnAction(e -> {
+            controller.showUpdateMenuItemForm(item);
             start(primaryStage); // Refresh the view
         });
-        GridPane.setConstraints(deleteButton, 1, 4);
+        GridPane.setConstraints(updateButton, 1, 4);
 
-        itemGrid.getChildren().addAll(imageView, nameLabel, descriptionLabel, priceLabel, updateButton, deleteButton);
+        itemGrid.getChildren().addAll(imageView, nameLabel, descriptionLabel, priceLabel, removeButton, updateButton);
         return itemGrid;
+    }
+
+    private void showRemoveConfirmationDialog(MenuItem item, Stage primaryStage) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation");
+        alert.setHeaderText("Remove Item");
+        alert.setContentText("Are you sure you want to remove " + item.getName() + " from the menu?");
+
+        ButtonType buttonTypeYes = new ButtonType("Yes");
+        ButtonType buttonTypeNo = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+
+        alert.showAndWait().ifPresent(type -> {
+            if (type == buttonTypeYes) {
+                controller.removeMenuItem(item);
+                start(primaryStage); // Refresh the view
+                System.out.println("Removed from menu: " + item.getName());
+            }
+        });
     }
 
     private ScrollPane createScrollPane(VBox listViewWithButtons) {
@@ -114,5 +129,20 @@ public class ManageMenuView extends UI {
         });
 
         return backButton;
+    }
+
+    private Button createAddItemButton(Stage primaryStage) {
+        Button addItemButton = new Button("Add Item To Menu");
+        addItemButton.setFont(new Font("Arial", 16));
+        addItemButton.setStyle("-fx-background-color: lightgray; -fx-text-fill: black; -fx-border-color: black; -fx-border-width: 4;");
+        addItemButton.setPrefSize(200, 50);
+        GridPane.setConstraints(addItemButton, 1, 2);
+
+        addItemButton.setOnAction(e -> {
+            controller.showAddMenuItemForm();
+            start(primaryStage); // Refresh the view
+        });
+
+        return addItemButton;
     }
 }
