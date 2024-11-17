@@ -2,6 +2,7 @@ package foodorderingsystem.View.Staff;
 
 import foodorderingsystem.Controller.Controller;
 import foodorderingsystem.Model.Staff.Order;
+import foodorderingsystem.View.UI;
 import javafx.geometry.*;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -20,13 +21,12 @@ import javafx.scene.text.FontWeight;
 import java.util.List;
 import java.util.Optional;
 
-public class ReceiptView {
+public class ReceiptView extends UI {
 
-    private final Controller controller;
     private final int tableNumber;
 
     public ReceiptView(Controller controller, int tableNumber) {
-        this.controller = controller;
+        super(controller);
         this.tableNumber = tableNumber;
     }
 

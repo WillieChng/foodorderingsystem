@@ -29,8 +29,7 @@ public class StaffMain extends Application {
             Controller controller = new Controller(order, connection);
 
             // Create a StaffView object with the Controller
-            StaffView staffView = new StaffView();
-            staffView.setController(controller);
+            StaffView staffView = new StaffView(controller);
             staffView.start(primaryStage);
 
         } catch (SQLException | IOException e) {

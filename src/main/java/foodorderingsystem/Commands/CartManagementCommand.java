@@ -15,8 +15,8 @@ public class CartManagementCommand implements Command {
 
     @Override
     public void execute() {
-        CartManagementView cartManagementView = new CartManagementView();
-        cartManagementView.setController(controller);
+        CartManagementView cartManagementView = new CartManagementView(controller);
+        //cartManagementView.setController(controller);
         cartManagementView.start(primaryStage);
     }
 }

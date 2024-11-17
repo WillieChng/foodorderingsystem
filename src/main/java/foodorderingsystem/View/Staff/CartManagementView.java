@@ -2,9 +2,9 @@ package foodorderingsystem.View.Staff;
 
 import foodorderingsystem.Controller.Controller;
 import foodorderingsystem.Model.Staff.Order;
+import foodorderingsystem.View.UI;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Application;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -20,16 +20,12 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Map;
 
-public class CartManagementView extends Application {
-    private Controller controller;
+public class CartManagementView extends UI {
+
     private Timeline timeline;
 
-    public CartManagementView() {
-        // No-argument constructor required by JavaFX
-    }
-
-    public void setController(Controller controller) {
-        this.controller = controller;
+    public CartManagementView(Controller controller) {
+        super(controller);
     }
 
     @Override
@@ -185,7 +181,7 @@ public class CartManagementView extends Application {
         start(primaryStage);
     }
 
-    @Override
+
     public void stop() {
         // Stop the timeline when the application exits
         if (timeline != null) {

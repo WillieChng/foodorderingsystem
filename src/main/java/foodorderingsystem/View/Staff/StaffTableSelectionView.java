@@ -2,6 +2,7 @@ package foodorderingsystem.View.Staff;
 
 import foodorderingsystem.Controller.Controller;
 import javafx.geometry.*;
+import foodorderingsystem.View.UI;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,12 +13,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-public class StaffTableSelectionView {
-
-    private final Controller controller;
+public class StaffTableSelectionView extends UI {
 
     public StaffTableSelectionView(Controller controller) {
-        this.controller = controller;
+        super(controller);
     }
 
     public void start(Stage primaryStage) {

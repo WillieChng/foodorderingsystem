@@ -2,30 +2,21 @@ package foodorderingsystem.View.Staff;
 
 import foodorderingsystem.Commands.CartManagementCommand;
 import foodorderingsystem.Commands.Command;
+import foodorderingsystem.View.UI;
 import foodorderingsystem.Commands.GenerateReceiptCommand;
 import foodorderingsystem.Commands.Invoker;
 import foodorderingsystem.Commands.ManageMenuCommand;
 import foodorderingsystem.Controller.Controller;
-import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class StaffView extends Application {
-    private Controller controller;
-
-    public StaffView() {
-        // No-argument constructor required by JavaFX
-    }
-
+public class StaffView extends UI {
+  
     public StaffView(Controller controller) {
-        this.controller = controller;
-    }
-
-    public void setController(Controller controller) {
-        this.controller = controller;
+        super(controller);
     }
 
     @Override
