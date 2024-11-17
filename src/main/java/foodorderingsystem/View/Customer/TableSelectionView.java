@@ -15,6 +15,10 @@ public class TableSelectionView extends UI {
 
     @Override
     public void start(Stage primaryStage) {
+        // Preserve the current size of the primary stage
+        double currentWidth = primaryStage.getWidth();
+        double currentHeight = primaryStage.getHeight();
+
         GridPane grid = createGridPane();
         Spinner<Integer> spinner = new Spinner<>();
         SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 8, 1);
@@ -32,5 +36,9 @@ public class TableSelectionView extends UI {
 
         // Update the scene's root node
         updateScene(primaryStage, grid);
+
+        // Restore the primary stage size
+        primaryStage.setWidth(currentWidth);
+        primaryStage.setHeight(currentHeight);
     }
 }

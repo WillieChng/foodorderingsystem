@@ -70,7 +70,7 @@ public class ManageMenuView extends UI {
         Label descriptionLabel = new Label(item.getDescription());
         GridPane.setConstraints(descriptionLabel, 1, 1);
 
-        Label priceLabel = new Label("RM" + item.getPrice());
+        Label priceLabel = new Label("RM" + String.format("%.2f", item.getPrice()));
         GridPane.setConstraints(priceLabel, 1, 2);
 
         Button removeButton = new Button("Remove From Menu");

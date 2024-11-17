@@ -22,6 +22,7 @@ import java.util.Map;
 public class CartManagementView extends UI {
     private Timeline timeline;
     private boolean isActive;
+    private VBox listViewWithButtons;
 
     public CartManagementView(Controller controller) {
         super(controller);
@@ -32,8 +33,12 @@ public class CartManagementView extends UI {
         System.out.println("Debug: Starting CartManagementView");
         isActive = true;
 
+        // Preserve the current size of the primary stage
+        double currentWidth = primaryStage.getWidth();
+        double currentHeight = primaryStage.getHeight();
+
         GridPane grid = createGridPane();
-        VBox listViewWithButtons = createListViewWithButtons(primaryStage);
+        listViewWithButtons = createListViewWithButtons(primaryStage);
         ScrollPane scrollPane = createScrollPane(listViewWithButtons);
         Button backButton = createBackButton(primaryStage);
 
@@ -43,34 +48,50 @@ public class CartManagementView extends UI {
         // Update the scene's root node
         updateScene(primaryStage, grid);
 
+        // Restore the primary stage size
+        primaryStage.setWidth(currentWidth);
+        primaryStage.setHeight(currentHeight);
+
         // Start the refresh timeline
-        startRefreshTimeline(primaryStage);
+        startRefreshTimeline();
     }
 
-    private void startRefreshTimeline(Stage primaryStage) {
-        timeline = new Timeline(new KeyFrame(Duration.seconds(5), e -> {
-            if (isActive) {
-                refresh(primaryStage);
-            }
-        }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
+    private void startRefreshTimeline() {
+        if (timeline == null) {
+            timeline = new Timeline(new KeyFrame(Duration.seconds(5), e -> {
+                if (isActive) {
+                    refresh();
+                }
+            }));
+            timeline.setCycleCount(Timeline.INDEFINITE);
+            timeline.play();
+        }
     }
 
     private void stopRefreshTimeline() {
         if (timeline != null) {
             timeline.stop();
+            timeline = null;
         }
     }
 
     private VBox createListViewWithButtons(Stage primaryStage) {
         VBox listViewWithButtons = new VBox(10);
-        listViewWithButtons.setAlignment(Pos.CENTER);
+        listViewWithButtons.setAlignment(Pos.TOP_CENTER); // Align items to the top
+        listViewWithButtons.setPrefSize(800, 600); // Set preferred size to match the primary stage
+
+        updateListViewWithButtons(listViewWithButtons);
+
+        return listViewWithButtons;
+    }
+
+    private void updateListViewWithButtons(VBox listViewWithButtons) {
+        listViewWithButtons.getChildren().clear();
 
         Map<Integer, List<Order>> orders = controller.getItemsFromOrders();
         if (orders == null) {
             System.err.println("Error: orders is null");
-            return listViewWithButtons;
+            return;
         }
         System.out.println("Debug: Retrieved cart items from controller: " + orders);
 
@@ -84,7 +105,7 @@ public class CartManagementView extends UI {
                 listViewWithButtons.getChildren().add(tableNumberLabel);
 
                 for (Order order : orderList) {
-                    listViewWithButtons.getChildren().add(createItemGrid(order, primaryStage));
+                    listViewWithButtons.getChildren().add(createItemGrid(order));
                 }
             }
         } else {
@@ -92,11 +113,9 @@ public class CartManagementView extends UI {
             noItemsLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
             listViewWithButtons.getChildren().add(noItemsLabel);
         }
-
-        return listViewWithButtons;
     }
 
-    private GridPane createItemGrid(Order order, Stage primaryStage) {
+    private GridPane createItemGrid(Order order) {
         GridPane itemGrid = new GridPane();
         itemGrid.setHgap(10);
         itemGrid.setVgap(10);
@@ -118,7 +137,7 @@ public class CartManagementView extends UI {
         Button clearButton = new Button("Clear");
         clearButton.setOnAction(e -> {
             controller.markOrderAsServed(order);
-            refresh(primaryStage); // Refresh the view
+            refresh(); // Refresh the view
         });
         GridPane.setConstraints(clearButton, 1, 2);
 
@@ -129,7 +148,7 @@ public class CartManagementView extends UI {
     private ScrollPane createScrollPane(VBox listViewWithButtons) {
         ScrollPane scrollPane = new ScrollPane(listViewWithButtons);
         scrollPane.setFitToWidth(true);
-        scrollPane.setPrefHeight(600);
+        scrollPane.setPrefHeight(600); // Set preferred height to match the primary stage
         GridPane.setConstraints(scrollPane, 0, 1, 2, 1);
         return scrollPane;
     }
@@ -151,8 +170,8 @@ public class CartManagementView extends UI {
         return backButton;
     }
 
-    private void refresh(Stage primaryStage) {
-        start(primaryStage);
+    private void refresh() {
+        updateListViewWithButtons(listViewWithButtons);
     }
 
     public void stop() {

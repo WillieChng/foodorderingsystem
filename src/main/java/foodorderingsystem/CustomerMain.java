@@ -14,7 +14,6 @@ import foodorderingsystem.View.Customer.TableSelectionView;
 
 public class CustomerMain extends Application {
 
-    private Controller controller;
     private Connection connection;
 
     @Override
@@ -25,32 +24,44 @@ public class CustomerMain extends Application {
             module.addOpens("foodorderingsystem.Model.Staff", ModuleLayer.boot().findModule("javafx.base").orElseThrow());
         });
 
-        // Create an Order object
-        Order order = new Order(0, null, 0, 0, null, false);
-
         try {
-            // Create a Database Connection
-            connection = DatabaseUtil.getInstance().getConnection();
-
-            // Create tables if they do not exist and import menu data if the table is empty
-            DatabaseUtil.getInstance().createTables();
-
-            // Create a Controller object with the Order and Database Connection
-            controller = new Controller(order, connection);
-
-            // Create a TableSelectionView object with the Controller
-            TableSelectionView tableSelectionView = new TableSelectionView(controller);
-            tableSelectionView.start(primaryStage);
+            initializeDatabase();
+            Controller controller = createController();
+            startTableSelectionView(primaryStage, controller);
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
     }
 
+    private void initializeDatabase() throws SQLException, IOException {
+        connection = DatabaseUtil.getInstance().getConnection();
+        DatabaseUtil.getInstance().createTables();
+    }
+
+    private Controller createController() {
+        Order order = new Order(0, null, 0, 0, null, false);
+        return new Controller(order, connection);
+    }
+
+    private void startTableSelectionView(Stage primaryStage, Controller controller) {
+        // Set fixed size for the primary stage
+        primaryStage.setWidth(800);
+        primaryStage.setHeight(600);
+
+        TableSelectionView tableSelectionView = new TableSelectionView(controller);
+        tableSelectionView.start(primaryStage);
+    }
+
     @Override
     public void stop() {
-        // Close the connection when the application exits
-        if (controller != null) {
-            controller.closeConnection();
+        closeDatabaseConnection();
+    }
+
+    private void closeDatabaseConnection() {
+        try {
+            DatabaseUtil.getInstance().closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

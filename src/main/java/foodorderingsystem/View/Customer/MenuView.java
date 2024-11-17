@@ -8,9 +8,11 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.stage.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
+import javafx.stage.*;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -23,6 +25,10 @@ public class MenuView extends UI {
 
     @Override
     public void start(Stage primaryStage) {
+        // Preserve the current size of the primary stage
+        double currentWidth = primaryStage.getWidth();
+        double currentHeight = primaryStage.getHeight();
+
         GridPane grid = createGridPane();
         VBox listViewWithButtons = createListViewWithButtons(primaryStage);
         ScrollPane scrollPane = createScrollPane(listViewWithButtons);
@@ -34,11 +40,16 @@ public class MenuView extends UI {
 
         // Update the scene's root node
         updateScene(primaryStage, grid);
+
+        // Restore the primary stage size
+        primaryStage.setWidth(currentWidth);
+        primaryStage.setHeight(currentHeight);
     }
 
     private VBox createListViewWithButtons(Stage primaryStage) {
         VBox listViewWithButtons = new VBox(10);
-        listViewWithButtons.setAlignment(Pos.CENTER);
+        listViewWithButtons.setAlignment(Pos.TOP_CENTER);
+        listViewWithButtons.setPrefSize(800, 600); // Set preferred size to match the primary stage
 
         List<MenuItem> menuItems = controller.getMenuItems();
 
@@ -71,10 +82,12 @@ public class MenuView extends UI {
         nameLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
         GridPane.setConstraints(nameLabel, 1, 0);
 
-        Label descriptionLabel = new Label(item.getDescription());
-        GridPane.setConstraints(descriptionLabel, 1, 1);
+        Text descriptionText = new Text(item.getDescription());
+        TextFlow descriptionTextFlow = new TextFlow(descriptionText);
+        descriptionTextFlow.setPrefWidth(700); // Set preferred width to ensure wrapping
+        GridPane.setConstraints(descriptionTextFlow, 1, 1);
 
-        Label priceLabel = new Label("RM" + item.getPrice());
+        Label priceLabel = new Label("RM" + String.format("%.2f", item.getPrice()));
         GridPane.setConstraints(priceLabel, 1, 2);
 
         Button addButton = new Button("Add");
@@ -84,14 +97,14 @@ public class MenuView extends UI {
         });
         GridPane.setConstraints(addButton, 1, 3);
 
-        itemGrid.getChildren().addAll(imageView, nameLabel, descriptionLabel, priceLabel, addButton);
+        itemGrid.getChildren().addAll(imageView, nameLabel, descriptionTextFlow, priceLabel, addButton);
         return itemGrid;
     }
 
     private ScrollPane createScrollPane(VBox listViewWithButtons) {
         ScrollPane scrollPane = new ScrollPane(listViewWithButtons);
         scrollPane.setFitToWidth(true);
-        scrollPane.setPrefHeight(600);
+        scrollPane.setPrefHeight(600); // Set preferred height to match the primary stage
         GridPane.setConstraints(scrollPane, 0, 1, 2, 1);
         return scrollPane;
     }
@@ -119,8 +132,16 @@ public class MenuView extends UI {
         GridPane.setConstraints(proceedToCartButton, 1, 2);
 
         proceedToCartButton.setOnAction(e -> {
+            // Preserve the current size of the primary stage
+            double currentWidth = primaryStage.getWidth();
+            double currentHeight = primaryStage.getHeight();
+
             CartView cartView = new CartView(controller);
             cartView.start(primaryStage);
+
+            // Restore the primary stage size
+            primaryStage.setWidth(currentWidth);
+            primaryStage.setHeight(currentHeight);
         });
 
         return proceedToCartButton;

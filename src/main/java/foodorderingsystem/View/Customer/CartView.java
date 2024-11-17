@@ -11,11 +11,14 @@ import javafx.scene.layout.*;
 import javafx.stage.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 import java.io.ByteArrayInputStream;
 import java.util.Map;
 
 public class CartView extends UI {
+    private VBox listViewWithButtons;
 
     public CartView(Controller controller) {
         super(controller);
@@ -23,8 +26,12 @@ public class CartView extends UI {
 
     @Override
     public void start(Stage primaryStage) {
+        // Set fixed size for the primary stage
+        primaryStage.setWidth(800);
+        primaryStage.setHeight(600);
+
         GridPane grid = createGridPane();
-        VBox listViewWithButtons = createListViewWithButtons(primaryStage);
+        listViewWithButtons = createListViewWithButtons(primaryStage);
         ScrollPane scrollPane = createScrollPane(listViewWithButtons);
         Button backButton = createBackButton(primaryStage);
 
@@ -43,8 +50,16 @@ public class CartView extends UI {
 
     private VBox createListViewWithButtons(Stage primaryStage) {
         VBox listViewWithButtons = new VBox(10);
-        listViewWithButtons.setAlignment(Pos.CENTER);
-        listViewWithButtons.setPrefSize(600, 400); // Set preferred size to keep the container constant
+        listViewWithButtons.setAlignment(Pos.TOP_CENTER); // Align items to the top
+        listViewWithButtons.setPrefSize(800, 600); // Set preferred size to match MenuView
+
+        updateListViewWithButtons(listViewWithButtons, primaryStage);
+
+        return listViewWithButtons;
+    }
+
+    private void updateListViewWithButtons(VBox listViewWithButtons, Stage primaryStage) {
+        listViewWithButtons.getChildren().clear();
 
         Map<MenuItem, Integer> cartItems = controller.getCartItems();
 
@@ -59,8 +74,6 @@ public class CartView extends UI {
             noItemsLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
             listViewWithButtons.getChildren().add(noItemsLabel);
         }
-
-        return listViewWithButtons;
     }
 
     private GridPane createItemGrid(MenuItem item, int quantity, Stage primaryStage) {
@@ -79,10 +92,12 @@ public class CartView extends UI {
         nameLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
         GridPane.setConstraints(nameLabel, 1, 0);
 
-        Label descriptionLabel = new Label(item.getDescription());
-        GridPane.setConstraints(descriptionLabel, 1, 1);
+        Text descriptionText = new Text(item.getDescription());
+        TextFlow descriptionTextFlow = new TextFlow(descriptionText);
+        descriptionTextFlow.setPrefWidth(700); // Set preferred width to ensure wrapping
+        GridPane.setConstraints(descriptionTextFlow, 1, 1);
 
-        Label priceLabel = new Label("RM" + item.getPrice());
+        Label priceLabel = new Label("RM" + String.format("%.2f", item.getPrice()));
         GridPane.setConstraints(priceLabel, 1, 2);
 
         Label quantityLabel = new Label("Quantity: " + quantity);
@@ -91,26 +106,26 @@ public class CartView extends UI {
         Button addButton = new Button("+");
         addButton.setOnAction(e -> {
             controller.addItemToCart(item);
-            start(primaryStage); // Refresh the view
+            refresh(primaryStage); // Refresh the view
         });
 
         Button removeButton = new Button("-");
         removeButton.setOnAction(e -> {
             controller.removeItemFromCart(item);
-            start(primaryStage); // Refresh the view
+            refresh(primaryStage); // Refresh the view
         });
 
         HBox buttonBox = new HBox(5, addButton, removeButton); // HBox with 5px spacing
         GridPane.setConstraints(buttonBox, 1, 4, 2, 1);
 
-        itemGrid.getChildren().addAll(imageView, nameLabel, descriptionLabel, priceLabel, quantityLabel, buttonBox);
+        itemGrid.getChildren().addAll(imageView, nameLabel, descriptionTextFlow, priceLabel, quantityLabel, buttonBox);
         return itemGrid;
     }
 
     private ScrollPane createScrollPane(VBox listViewWithButtons) {
         ScrollPane scrollPane = new ScrollPane(listViewWithButtons);
         scrollPane.setFitToWidth(true);
-        scrollPane.setPrefHeight(600);
+        scrollPane.setPrefHeight(600); // Set preferred height to match MenuView
         GridPane.setConstraints(scrollPane, 0, 1, 2, 1);
         return scrollPane;
     }
@@ -145,5 +160,9 @@ public class CartView extends UI {
         });
 
         return checkoutButton;
+    }
+
+    private void refresh(Stage primaryStage) {
+        updateListViewWithButtons(listViewWithButtons, primaryStage);
     }
 }
