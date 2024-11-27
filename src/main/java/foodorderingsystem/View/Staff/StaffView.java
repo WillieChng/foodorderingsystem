@@ -45,10 +45,15 @@ public class StaffView extends UI {
         generateReceiptButton.setStyle("-fx-font-size: 20px; -fx-padding: 15px;");
         manageMenuButton.setStyle("-fx-font-size: 20px; -fx-padding: 15px;");
 
+        // Create receiver instances
+        CartManagementView cartManagementView = new CartManagementView(controller);
+        StaffTableSelectionView staffTableSelectionView = new StaffTableSelectionView(controller);
+        ManageMenuView manageMenuView = new ManageMenuView(controller);
+
         // Create command objects
-        Command cartManagementCommand = new CartManagementCommand(controller, primaryStage);
-        Command generateReceiptCommand = new GenerateReceiptCommand(controller, primaryStage);
-        Command manageMenuCommand = new ManageMenuCommand(controller, primaryStage);
+        Command cartManagementCommand = new CartManagementCommand(cartManagementView, primaryStage);
+        Command generateReceiptCommand = new GenerateReceiptCommand(staffTableSelectionView, primaryStage);
+        Command manageMenuCommand = new ManageMenuCommand(manageMenuView, primaryStage);
 
         // Create an invoker
         Invoker invoker = new Invoker();

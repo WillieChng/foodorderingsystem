@@ -1,22 +1,19 @@
 package foodorderingsystem.Commands;
 
-import foodorderingsystem.Controller.Controller;
 import foodorderingsystem.View.Staff.CartManagementView;
 import javafx.stage.Stage;
 
 public class CartManagementCommand implements Command {
-    private Controller controller;
+    private CartManagementView cartManagementView;
     private Stage primaryStage;
 
-    public CartManagementCommand(Controller controller, Stage primaryStage) {
-        this.controller = controller;
+    public CartManagementCommand(CartManagementView cartManagementView, Stage primaryStage) {
+        this.cartManagementView = cartManagementView;
         this.primaryStage = primaryStage;
     }
 
     @Override
     public void execute() {
-        CartManagementView cartManagementView = new CartManagementView(controller);
-        //cartManagementView.setController(controller);
         cartManagementView.start(primaryStage);
     }
 }

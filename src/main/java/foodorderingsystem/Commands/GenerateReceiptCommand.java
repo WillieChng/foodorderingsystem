@@ -1,21 +1,19 @@
 package foodorderingsystem.Commands;
 
-import foodorderingsystem.Controller.Controller;
 import foodorderingsystem.View.Staff.StaffTableSelectionView;
 import javafx.stage.Stage;
 
 public class GenerateReceiptCommand implements Command {
-    private Controller controller;
+    private StaffTableSelectionView staffTableSelectionView;
     private Stage primaryStage;
 
-    public GenerateReceiptCommand(Controller controller, Stage primaryStage) {
-        this.controller = controller;
+    public GenerateReceiptCommand(StaffTableSelectionView staffTableSelectionView, Stage primaryStage) {
+        this.staffTableSelectionView = staffTableSelectionView;
         this.primaryStage = primaryStage;
     }
 
     @Override
     public void execute() {
-        StaffTableSelectionView tableSelectionView = new StaffTableSelectionView(controller);
-        tableSelectionView.start(primaryStage);
+        staffTableSelectionView.start(primaryStage);
     }
 }
