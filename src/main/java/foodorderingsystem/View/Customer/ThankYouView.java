@@ -31,7 +31,7 @@ public class ThankYouView extends UI {
         VBox thankYouBox = new VBox(10);
         thankYouBox.setAlignment(Pos.CENTER);
 
-        Label thankYouLabel = new Label("Thank you for your order!");
+        Label thankYouLabel = new Label("Please wait patiently for your order :)");
         thankYouLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
 
         Button backButton = new Button("Okay");
